@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>GARCHATRON 5500 - PPV Rotary Turbo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['SF Pro Display', 'SF Pro Text', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        mono: ['SF Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+                    },
+                    colors: {
+                        glass: {
+                            light: 'rgba(255, 255, 255, 0.7)',
+                            dark: 'rgba(17, 24, 39, 0.7)',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards'
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" crossorigin="anonymous"></script>
+    <style>
+        body { transition: background-color 0.5s ease, color 0.5s ease; font-family: 'SF Pro Display', sans-serif; }
+        
+        /* --- BACKGROUND ANIMATION BASE --- */
+        @keyframes move { 100% { transform: translate3d(0, 0, 1px) rotate(360deg); } }
+        .background { position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; overflow: hidden; z-index: -1; pointer-events: none; background: #ffffff; }
+        .background span { width: 50vmin; height: 50vmin; border-radius: 50vmin; backface-visibility: hidden; position: absolute; animation: move linear infinite; }
+        
+        /* Light Mode Particles */
+        .background span:nth-child(1) { color: #ebf9ff; top: 51%; left: 95%; animation-duration: 61s; animation-delay: -74s; transform-origin: 1vw 0vh; box-shadow: 100vmin 0 13vmin currentColor; }
+        .background span:nth-child(2) { color: #ebf9ff; top: 93%; left: 88%; animation-duration: 78s; animation-delay: -80s; transform-origin: 5vw -11vh; box-shadow: -100vmin 0 13vmin currentColor; }
+        .background span:nth-child(3) { color: #c5d9ec; top: 55%; left: 86%; animation-duration: 84s; animation-delay: -19s; transform-origin: -21vw 15vh; box-shadow: -100vmin 0 13vmin currentColor; }
+        .background span:nth-child(4) { color: #d2e8f8; top: 67%; left: 58%; animation-duration: 97s; animation-delay: -50s; transform-origin: -18vw 5vh; box-shadow: 100vmin 0 13vmin currentColor; }
+        .background span:nth-child(5) { color: #d2e8f8; top: 98%; left: 46%; animation-duration: 64s; animation-delay: -21s; transform-origin: -1vw 15vh; box-shadow: 100vmin 0 13vmin currentColor; }
+        .background span:nth-child(6) { color: #c5d9ec; top: 56%; left: 57%; animation-duration: 68s; animation-delay: -40s; transform-origin: -17vw -4vh; box-shadow: -100vmin 0 12vmin currentColor; }
+
+        /* Dark Mode */
+        .dark .background { background: #0a111f; }
+        .dark .background span:nth-child(1) { color: #1d2c44; top: 76%; left: 32%; animation-duration: 15s; animation-delay: -41s; transform-origin: 8vw -18vh; box-shadow: -100vmin 0 12vmin currentColor; }
+        .dark .background span:nth-child(2) { color: #1d2c44; top: 53%; left: 24%; animation-duration: 32s; animation-delay: -35s; transform-origin: -11vw 13vh; box-shadow: -100vmin 0 12vmin currentColor; }
+        .dark .background span:nth-child(3) { color: #3c5c86; top: 11%; left: 28%; animation-duration: 38s; animation-delay: -3s; transform-origin: 10vw -22vh; box-shadow: -100vmin 0 12vmin currentColor; }
+
+        .glass-panel { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07); }
+        .dark .glass-panel { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
+
+        .liquid-glass { position: relative; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(16px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: inset 1px 1px 0px 0px rgba(255,255,255,0.7), inset -1px -1px 0px 0px rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.05); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .liquid-glass:hover { transform: translateY(-2px) scale(1.01); background: rgba(255, 255, 255, 0.3); }
+        .dark .liquid-glass { background: rgba(20, 25, 35, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .dark .liquid-glass:hover { background: rgba(30, 40, 50, 0.6); }
+
+        .pill-active { transform: scale(1.05); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); border-color: #3b82f6 !important; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        input:checked + div { background-color: #111827; border-color: #111827; }
+        .dark input:checked + div { background-color: #f8fafc; border-color: #f8fafc; }
+        input:checked + div svg { transform: scale(1); opacity: 1; }
+        .dark input:checked + div svg { color: #111827; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-12 px-4 text-slate-800 dark:text-slate-100 font-sans">
+    <div class="background">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    
+    <button class="fixed top-6 right-6 z-50 p-3 rounded-full glass-panel hover:scale-110 transition-transform cursor-pointer group" id="theme-btn">
+        <span class="material-symbols-rounded text-xl text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-yellow-400 transition-colors">dark_mode</span>
+    </button>
+    
+    <header class="text-center mb-10 w-full max-w-5xl animate-slide-up relative group">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-black dark:bg-white rounded-3xl shadow-2xl mb-6 transition-colors duration-500">
+            <span class="material-symbols-rounded text-white dark:text-black text-4xl">sports_esports</span>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight mb-3">
+            <span id="title-main">GARCHATRON 5500</span> <span id="title-accent" style="color: rgb(53, 121, 245);">Twin-Turbo ROTARY PPV</span>
+        </h1>
+        <p class="text-lg text-slate-500 dark:text-slate-400 font-medium mb-1" id="title-sub">Sistema de verificación y depuración de datos PPV IR-GRD Pre-Carga</p>
+        <p class="text-base text-slate-500 dark:text-slate-400 font-normal">Ver. Dialisis+QTX</p>
+    </header>
+    
+    <main class="w-full max-w-[1400px] glass-panel rounded-[2.5rem] overflow-hidden animate-slide-up shadow-2xl" style="animation-delay: 0.1s;">
+        <div class="p-10 md:p-14 border-b border-slate-200/50 dark:border-slate-700/50">
+            <div class="relative flex flex-col items-center justify-center p-16 border-3 border-dashed border-slate-300 dark:border-slate-600 rounded-[2rem] bg-white/40 dark:bg-slate-800/40 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-blue-500 dark:hover:border-blue-400 transition-all cursor-pointer group" id="drop-zone">
+                <input accept=".txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="file-input" type="file">
+                <div class="flex flex-col items-center gap-5 transition-transform group-hover:scale-105 duration-300 pointer-events-none">
+                    <span class="material-symbols-rounded text-6xl text-slate-400 dark:text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" id="drop-icon">upload_file</span>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-slate-700 dark:text-slate-200" id="drop-title">Cargar PPV-GRD</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 font-mono bg-white/60 dark:bg-black/30 px-4 py-1.5 rounded-full" id="drop-subtitle">.txt</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LIBRO DE PARTOS -->
+            <div class="relative mt-6 flex items-center justify-center gap-5 p-6 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-[1.5rem] bg-white/40 dark:bg-slate-800/40 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-fuchsia-500 transition-all cursor-pointer group" id="parto-drop-zone">
+                <input accept=".xlsx,.xls" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="parto-file-input" type="file">
+                <span class="material-symbols-rounded text-4xl text-slate-400 group-hover:text-fuchsia-500 transition-colors pointer-events-none" id="parto-drop-icon">child_care</span>
+                <div class="text-left pointer-events-none">
+                    <p class="text-lg font-bold text-slate-700 dark:text-slate-200" id="parto-drop-title">Cargar Libro de Partos (opcional)</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono" id="parto-drop-sub">.xlsx · completa FECPART, TGESTAC y datos RN del TXT</p>
+                </div>
+                <button class="hidden relative z-20 ml-4 px-3 py-1 text-xs font-semibold text-slate-500 hover:text-red-500 rounded-full" id="parto-clear" type="button">Quitar</button>
+            </div>
+
+            <!-- LIBRO DE PABELLÓN -->
+            <div class="relative mt-4 flex items-center justify-center gap-5 p-6 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-[1.5rem] bg-white/40 dark:bg-slate-800/40 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-orange-500 transition-all cursor-pointer group" id="pablib-drop-zone">
+                <input accept=".xlsx,.xls" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="pablib-file-input" type="file">
+                <span class="material-symbols-rounded text-4xl text-slate-400 group-hover:text-orange-500 transition-colors pointer-events-none" id="pablib-drop-icon">medical_services</span>
+                <div class="text-left pointer-events-none">
+                    <p class="text-lg font-bold text-slate-700 dark:text-slate-200" id="pablib-drop-title">Cargar Libro de Pabellón (opcional)</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono" id="pablib-drop-sub">.xlsx · AMBULATORIO + Rev. CMA de cualquier ámbito · RUT + Ficha + fecha/hora pabellón → SIDEBAR 1-3</p>
+                </div>
+                <button class="hidden relative z-20 ml-4 px-3 py-1 text-xs font-semibold text-slate-500 hover:text-red-500 rounded-full" id="pablib-clear" type="button">Quitar</button>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-rut" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">RUT Prov.</span><span class="block text-xs text-slate-500 dark:text-slate-400">CIP 40-54MM</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none border-l-4 border-l-red-500 dark:border-l-red-400">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-empty-rut" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">RUT Vacío</span><span class="block text-xs text-slate-500 dark:text-slate-400">CIP Vacío -&gt; 99</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-geo" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">Geo / Etnia</span><span class="block text-xs text-slate-500 dark:text-slate-400">Provincia, Etnia=96</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-pam" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">PAM &gt;60</span><span class="block text-xs text-slate-500 dark:text-slate-400">Programa 06</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none border-l-4 border-l-teal-500 dark:border-l-teal-400">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-active" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">Activos</span><span class="block text-xs text-slate-500 dark:text-slate-400">Edad 18-59, T.CIP 1</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none border-l-4 border-l-cyan-600 dark:border-l-cyan-400">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-prev" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">Previsión</span><span class="block text-xs text-slate-500 dark:text-slate-400">Sin Prev. -&gt; FONASA A</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-pab" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">Pabellón</span><span class="block text-xs text-slate-500 dark:text-slate-400">Qx, CMA, Notas</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none border-l-4 border-l-amber-500 dark:border-l-amber-400">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-out-pab" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">Pab. Post-EP.</span><span class="block text-xs text-slate-500 dark:text-slate-400">Fecha Qx &gt; Alta</span></div>
+                </label>
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none">
+                    <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-hd" type="checkbox"><div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center"><svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                    <div><span class="block text-sm font-bold text-slate-800 dark:text-slate-200">Hosp. Dom.</span><span class="block text-xs text-slate-500 dark:text-slate-400">Continuidad</span></div>
+                </label>
+                
+                <label class="filter-item liquid-glass p-4 flex items-center gap-4 cursor-pointer select-none border-l-4 border-l-red-500" id="btn-dialisis-container">
+                    <div class="relative flex items-center justify-center">
+                        <input class="peer sr-only" id="check-dialisis" type="checkbox">
+                        <div class="w-6 h-6 border-2 border-slate-300 dark:border-slate-500 rounded-lg transition-colors flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-bold text-slate-800 dark:text-slate-200" id="text-dialisis-title">Cargar Diálisis: NO</span>
+                        <span class="block text-xs text-red-500 font-bold" id="text-dialisis-sub">Excluyendo registros</span>
+                    </div>
+                </label>
+
+                <div class="flex flex-col gap-3 justify-center">
+                    <label class="filter-item liquid-glass p-2 flex items-center gap-3 cursor-pointer select-none border-l-4 border-l-slate-800 dark:border-l-white">
+                        <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-dead" type="checkbox"><div class="w-4 h-4 border-2 border-slate-300 dark:border-slate-500 rounded-md transition-colors flex items-center justify-center"><svg class="w-3 h-3 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                        <div><span class="block text-xs font-bold text-slate-800 dark:text-slate-200">Fallecidos</span></div>
+                    </label>
+                    <label class="filter-item liquid-glass p-2 flex items-center gap-3 cursor-pointer select-none border-l-4 border-l-blue-600 dark:border-l-blue-400">
+                        <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-rn" type="checkbox"><div class="w-4 h-4 border-2 border-slate-300 dark:border-slate-500 rounded-md transition-colors flex items-center justify-center"><svg class="w-3 h-3 text-white dark:text-black transform scale-0 opacity-0 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+                        <div><span class="block text-xs font-bold text-slate-800 dark:text-slate-200">Recién Nacidos</span></div>
+                    </label>
+                    <label class="filter-item liquid-glass p-2 flex items-center gap-3 cursor-pointer select-none border-l-4 border-l-fuchsia-600 dark:border-l-fuchsia-400">
+                        <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-parto" type="checkbox"><div class="w-4 h-4 border-2 border-slate-300 dark:border-slate-500 rounded-md transition-colors flex items-center justify-center"></div></div>
+                        <div><span class="block text-xs font-bold text-slate-800 dark:text-slate-200">Libro Parto</span></div>
+                    </label>
+                    <label class="filter-item liquid-glass p-2 flex items-center gap-3 cursor-pointer select-none border-l-4 border-l-orange-600 dark:border-l-orange-400">
+                        <div class="relative flex items-center justify-center"><input checked="" class="peer sr-only" id="check-pablib" type="checkbox"><div class="w-4 h-4 border-2 border-slate-300 dark:border-slate-500 rounded-md transition-colors flex items-center justify-center"></div></div>
+                        <div><span class="block text-xs font-bold text-slate-800 dark:text-slate-200">Libro Pabellón</span></div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mt-14 flex flex-col items-center gap-6">
+                <button class="w-full py-5 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-extrabold rounded-2xl flex items-center justify-center gap-3 text-xl transition-all shadow-none cursor-not-allowed" disabled="" id="btn-process">
+                    <span class="material-symbols-rounded text-3xl">play_circle</span> Procesar Datos
+                </button>
+                <button class="hidden px-8 py-3 text-sm font-semibold text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all flex items-center gap-2" id="btn-clear">
+                    <span class="material-symbols-rounded">delete_sweep</span> Limpiar Datos
+                </button>
+            </div>
+        </div>
+        
+        <div class="hidden bg-slate-50/50 dark:bg-slate-900/30 backdrop-blur-sm" id="output-area">
+            <div class="px-10 py-6 border-b border-slate-200/50 dark:border-slate-700/50 flex flex-wrap gap-4 text-sm font-medium" id="stats-bar"></div>
+            <div class="p-10 lg:p-14">
+                <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+                        <div class="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                            <span class="material-symbols-rounded text-slate-400">table_rows</span>
+                        </div>
+                        <span id="preview-title">Vista Previa</span>
+                    </h2>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="hidden px-6 py-3 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 transition-all hover:-translate-y-0.5" id="btn-pdf-dead">
+                            <span class="material-symbols-rounded text-red-500">skull</span> PDF Fallecidos
+                        </button>
+                        <button class="hidden px-6 py-3 bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 transition-all hover:-translate-y-0.5" id="btn-pdf-rn">
+                            <span class="material-symbols-rounded text-blue-500">child_care</span> PDF Recién Nacidos
+                        </button>
+                        <button class="hidden px-6 py-3 bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 transition-all hover:-translate-y-0.5" id="btn-pdf-stay">
+                            <span class="material-symbols-rounded text-emerald-500">timer</span> Reporte Estancias
+                        </button>
+                        <button class="hidden px-6 py-3 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 transition-all hover:-translate-y-0.5" id="btn-pdf-dialisis">
+                            <span class="material-symbols-rounded text-rose-500">water_drop</span> PDF Diálisis
+                        </button>
+                        <button class="px-6 py-3 bg-slate-900 dark:bg-white hover:bg-blue-600 dark:hover:bg-blue-400 text-white dark:text-slate-900 text-sm font-bold rounded-xl shadow-lg shadow-blue-500/10 flex items-center gap-2 transition-all hover:-translate-y-0.5" id="btn-download">
+                            <span class="material-symbols-rounded">save</span> Descargar Datos
+                        </button>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/5">
+                    <div class="overflow-x-auto custom-scroll max-h-[600px]">
+                        <table class="w-full text-xs text-left whitespace-nowrap">
+                            <thead class="bg-slate-50/90 dark:bg-slate-800/90 backdrop-blur text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700">
+                                <tr>
+                                    <th class="px-6 py-4 sticky left-0 bg-slate-50 dark:bg-slate-800 z-20 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)]">Ficha</th>
+                                    <th class="px-6 py-4">Episodio</th>
+                                    <th class="px-6 py-4" id="th-cip">CIP</th>
+                                    <th class="px-6 py-4" id="th-tcip">T.CIP</th>
+                                    <th class="px-6 py-4" id="th-mres">ETNIA</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-700" id="th-prov">PROV</th>
+                                    <th class="px-6 py-4" id="th-regcon" style="display:none;">REGCON</th>
+                                    <th class="px-6 py-4" id="th-catocp" style="display:none;">CAT_OCP</th>
+                                    <th class="px-6 py-4" id="th-edad">Edad</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-700" id="th-prog">Prog</th>
+                                    <th class="px-6 py-4" id="th-tpab">T.Pab</th>
+                                    <th class="px-6 py-4" id="th-fechax">Fecha Qx</th>
+                                    <th class="px-6 py-4" id="th-tipalt" style="display:none;">Alta</th>
+                                    <th class="px-6 py-4" id="th-medico" style="display:none;">Medico</th>
+                                    <th class="px-6 py-4 bg-slate-100/50 dark:bg-slate-800/50 border-x border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">NOTA</th>
+                                    <th class="px-6 py-4 text-right" id="th-estadia">Estadía</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 bg-white/50 dark:bg-slate-900/50" id="table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="hidden mt-8 py-16 text-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl opacity-60" id="msg-no-changes">
+                    <span class="material-symbols-rounded text-6xl text-slate-300 dark:text-slate-600 mb-4 block">assignment_turned_in</span>
+                    <p class="text-xl text-slate-500 dark:text-slate-400 font-medium">Todos los registros cumplen la norma.</p>
+                </div>
+            </div>
+            <div class="h-6"></div>
+        </div>
+    </main>
+    
+    <footer class="mt-8 mb-4 animate-slide-up flex flex-col items-center gap-4" style="animation-delay: 0.2s;">
+        <div class="flex gap-4">
+            <button class="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-2 transition-colors px-4 py-2 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50" id="btn-save-tool">
+                <span class="material-symbols-rounded text-base">code</span> Guardar Herramienta
+            </button>
+        </div>
+        <div class="text-center px-4 max-w-4xl">
+            <p class="text-xs text-red-500 font-bold mb-2">
+                Documento de uso interno exclusivo de la Unidad de Análisis Clínico GRD. Contiene datos de pacientes protegidos por la Ley N° 19.628 sobre Protección de la Vida Privada y la Ley N° 20.584. Queda estrictamente prohibida su reproducción, distribución o divulgación no autorizada.
+            </p>
+            <p class="text-xs text-slate-400 dark:text-slate-500 select-none font-mono">
+                © 2026 [ GARCHATRON 5500 Twin-Turbo ROTARY PPV v8.2.0 ] TM. Kevin Garay SAPE LOQUITA
+            </p>
+        </div>
+    </footer>
+    
+    <a class="hidden" id="download-anchor"></a>
+    
+    <script>
+        // --- 1. THEME LOGIC ---
+        (function() {
+            const btn = document.getElementById('theme-btn');
+            const icon = btn.querySelector('span');
+            const html = document.documentElement;
+            let isDark = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            function updateTheme() {
+                if (isDark) { html.classList.add('dark'); icon.textContent = 'light_mode'; } 
+                else { html.classList.remove('dark'); icon.textContent = 'dark_mode'; }
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }
+            updateTheme();
+            btn.addEventListener('click', () => { isDark = !isDark; updateTheme(); });
+        })();
+
+        // --- 2. CONSTANTS ---
+        const APP_NAME = "GARCHATRON 5500 Twin-Turbo ROTARY PPV";
+        const APP_VERSION = "v8.2.0";
+        const COL_MAP = {
+            HISTORIA: 1, EPISODIO: 2, FECNAC: 3, SEXO: 4, FECING: 5, TIPING: 6,
+            REGCON: 7, ETNIA: 8, PROV: 9, COMUNA: 10, PAIS: 11, FECALT: 12, TIPALT: 13,
+            SERVING: 14, SERVALT: 15, TIPO_CIP: 16, FEC_INT_1: 19, 
+            CIP: 33, NOMBRE: 41, MEDICOALT: 32, PROGRAMA: 44,
+            ESPINT: 51, TIP_PAB: 52, 
+            OCUPACION: 74, CAT_OCP: 75, NOTA: 76       
+        };
+        const HD_MEDICOS = ["08442302-5", "15347140-1", "28181453-2"];
+        // Valores NEFROTRON para Diálisis (índices según layout PPV-GRD)
+        const DIALISIS_NEFROTRON = [
+            [COL_MAP.SERVING, '20-346'],  // SERVING
+            [COL_MAP.SERVALT, '20-346'],  // SERVALT
+            [17, '30'],                   // ESPECIALIDAD
+            [COL_MAP.TIPALT, '1'],        // TIPALT
+            [34, '5'],                    // PROC
+            [35, '2'],                    // TIPO_ACTIVIDAD
+            [COL_MAP.PROGRAMA, '06'],     // PROGRAMA
+            [COL_MAP.CAT_OCP, '00'],      // CAT_OCP
+            [COL_MAP.OCUPACION, '99'],    // OCUPACION
+            [COL_MAP.NOTA, '[Diálisis]']  // NOTA
+        ];
+        // Médicos QTX (Sillón Oncológico)
+        const QTX_MEDICOS = ['17621726-K', '27109691-7'];
+        // Valores para episodios QTX
+        const QTX_VALORES = [
+            [COL_MAP.SERVING, '20-345'],  // SERVING
+            [COL_MAP.SERVALT, '20-345'],  // SERVALT
+            [17, '45'],                   // ESPECIALIDAD
+            [COL_MAP.TIPALT, '1'],        // TIPALT
+            [34, '5'],                    // PROC
+            [35, '2'],                    // TIPO_ACTIVIDAD
+            [COL_MAP.PROGRAMA, '06'],     // PROGRAMA
+            [COL_MAP.CAT_OCP, '00'],      // CAT_OCP
+            [COL_MAP.OCUPACION, '99'],    // OCUPACION
+            [COL_MAP.NOTA, 'Rev. Sillón Oncológico QTX']  // NOTA
+        ];
+        const RN_REGEX = /^(HIJO\s+DE|HIJA\s+DE|RN\s+DE|RN\s+)/i;
+
+        // --- 3. STATE ---
+        let rawData = null;
+        let processedData = null;
+        let originalFileName = "data.txt";
+        let deceasedList = [];
+        let rnList = [];
+        let allParsedRecords = [];
+        let partoBook = null;      // { births: [...], fileName }
+        let partoReport = { ok: 0, sin: [] };
+        let pabBook = null;        // { rows: [...], fileName }
+        let pabReport = { ok: 0, sin: [] };
+        let pabApplied = false;
+        let partoApplied = false;  // true si el último procesamiento cruzó el libro de partos
+        let modData = {
+            cleaned: [], rut: [], empty_rut: [], geo: [], pam: [], active: [], prev: [], pab: [], 
+            cma: [], qtx: [], hd: [], dialisis: [], dead: [], rn: [], out_pab: [], parto: [], pablib: []
+        };
+        let activeFilter = 'cleaned'; 
+
+        // --- 4. DOM ELEMENTS ---
+        const els = {
+            dropZone: document.getElementById('drop-zone'),
+            fileInput: document.getElementById('file-input'),
+            dropIcon: document.getElementById('drop-icon'),
+            dropTitle: document.getElementById('drop-title'),
+            dropSub: document.getElementById('drop-subtitle'),
+            btnProcess: document.getElementById('btn-process'),
+            btnClear: document.getElementById('btn-clear'),
+            outputArea: document.getElementById('output-area'),
+            statsBar: document.getElementById('stats-bar'),
+            tableBody: document.getElementById('table-body'),
+            msgNoChanges: document.getElementById('msg-no-changes'),
+            previewTitle: document.getElementById('preview-title'),
+            btnPdfDead: document.getElementById('btn-pdf-dead'),
+            btnPdfRn: document.getElementById('btn-pdf-rn'),
+            btnPdfStay: document.getElementById('btn-pdf-stay'),
+            btnPdfDialisis: document.getElementById('btn-pdf-dialisis'),
+            btnDownload: document.getElementById('btn-download'),
+            btnSaveTool: document.getElementById('btn-save-tool'),
+            anchor: document.getElementById('download-anchor'),
+            checks: {
+                rut: document.getElementById('check-rut'), geo: document.getElementById('check-geo'),
+                pam: document.getElementById('check-pam'), active: document.getElementById('check-active'),
+                prev: document.getElementById('check-prev'), pab: document.getElementById('check-pab'),
+                hd: document.getElementById('check-hd'), dialisis: document.getElementById('check-dialisis'),
+                dead: document.getElementById('check-dead'), rn: document.getElementById('check-rn'),
+                empty_rut: document.getElementById('check-empty-rut'), out_pab: document.getElementById('check-out-pab'), parto: document.getElementById('check-parto'), pablib: document.getElementById('check-pablib')
+            },
+            headers: {
+                edad: document.getElementById('th-edad'), prog: document.getElementById('th-prog'),
+                estadia: document.getElementById('th-estadia'), tcip: document.getElementById('th-tcip'),
+                mres: document.getElementById('th-mres'), prov: document.getElementById('th-prov'),
+                regcon: document.getElementById('th-regcon'), catocp: document.getElementById('th-catocp'),
+                tpab: document.getElementById('th-tpab'), fechax: document.getElementById('th-fechax'),
+                tipalt: document.getElementById('th-tipalt'), medico: document.getElementById('th-medico')
+            }
+        };
+
+        // --- 5. EVENT LISTENERS ---
+        els.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); els.dropZone.classList.add('border-blue-500', 'scale-[1.01]'); });
+        ['dragleave', 'drop'].forEach(evt => els.dropZone.addEventListener(evt, (e) => { e.preventDefault(); els.dropZone.classList.remove('border-blue-500', 'scale-[1.01]'); }));
+        els.dropZone.addEventListener('drop', (e) => loadFile(e.dataTransfer.files[0]));
+        els.fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
+        els.btnProcess.addEventListener('click', processData);
+        els.btnClear.addEventListener('click', clearData);
+        els.btnPdfDead.addEventListener('click', generatePdfDead);
+        els.btnPdfRn.addEventListener('click', generatePdfRN);
+        els.btnPdfStay.addEventListener('click', generatePdfStay);
+        els.btnPdfDialisis.addEventListener('click', generatePdfDialisis);
+        
+        els.btnDownload.addEventListener('click', () => {
+            const estadoDialisis = els.checks.dialisis.checked ? 'SI' : 'NO';
+            const tagPartos = partoApplied ? '[PARTOS SI]' : '';
+            const tagPab = `[Cruce Pabellones ${pabApplied ? 'SI' : 'NO'}]`;
+            downloadFile(processedData, `[Precarga GRD][Dialisis ${estadoDialisis}]${tagPartos}${tagPab} ${originalFileName}`, 'text/plain');
+        });
+
+        els.btnSaveTool.addEventListener('click', () => {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            downloadFile(htmlContent, 'Suite_PPV_v8.2.0.html', 'text/html');
+        });
+
+        els.checks.dialisis.addEventListener('change', (e) => {
+            const container = document.getElementById('btn-dialisis-container');
+            const title = document.getElementById('text-dialisis-title');
+            const sub = document.getElementById('text-dialisis-sub');
+            if(e.target.checked) {
+                title.innerText = "Cargar Diálisis: SÍ"; sub.innerText = "Incluyendo (formato Nefrotron)";
+                sub.className = "block text-xs text-emerald-500 font-bold";
+                container.classList.replace('border-l-red-500', 'border-l-emerald-500');
+            } else {
+                title.innerText = "Cargar Diálisis: NO"; sub.innerText = "Excluyendo registros";
+                sub.className = "block text-xs text-red-500 font-bold";
+                container.classList.replace('border-l-emerald-500', 'border-l-red-500');
+            }
+        });
+
+        // --- LIBRO DE PARTOS: carga ---
+        const pEls = { zone: document.getElementById('parto-drop-zone'), input: document.getElementById('parto-file-input'), icon: document.getElementById('parto-drop-icon'),
+                       title: document.getElementById('parto-drop-title'), sub: document.getElementById('parto-drop-sub'), clear: document.getElementById('parto-clear') };
+        pEls.zone.addEventListener('dragover', (e) => { e.preventDefault(); });
+        pEls.zone.addEventListener('drop', (e) => { e.preventDefault(); loadPartoFile(e.dataTransfer.files[0]); });
+        pEls.input.addEventListener('change', (e) => loadPartoFile(e.target.files[0]));
+        pEls.clear.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); resetPartoUI(); });
+
+        function resetPartoUI() {
+            partoBook = null; pEls.input.value = '';
+            pEls.icon.innerText = 'child_care'; pEls.icon.classList.remove('text-emerald-500'); pEls.icon.classList.add('text-slate-400');
+            pEls.title.innerText = 'Cargar Libro de Partos (opcional)'; pEls.sub.innerText = '.xlsx · completa FECPART, TGESTAC y datos RN del TXT';
+            pEls.clear.classList.add('hidden');
+        }
+
+        // Excel: serial -> Date; acepta texto dd/mm/yyyy y hh:mm(:ss)
+        function partoDate(d, h) {
+            let y, m, day, hh = 0, mm = 0;
+            if (typeof d === 'number') { const dt = new Date(Math.round((d - 25569) * 864e5)); y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; day = dt.getUTCDate(); }
+            else if (d) { const p = String(d).trim().split(/[\/\-]/).map(Number); if (p.length < 3) return null; [day, m, y] = p; }
+            else return null;
+            if (!y || y < 2000) return null;           // 31/12/1969 = fila sin fecha en el libro
+            if (typeof h === 'number') { const t = Math.round(h * 1440); hh = Math.floor(t / 60) % 24; mm = t % 60; }
+            else if (h) { const p = String(h).split(':').map(Number); hh = p[0] || 0; mm = p[1] || 0; }
+            return new Date(y, m - 1, day, hh, mm);
+        }
+
+        function fmtDT(d) {
+            const z = (n) => String(n).padStart(2, '0');
+            return `${z(d.getDate())}/${z(d.getMonth() + 1)}/${d.getFullYear()} ${z(d.getHours())}:${z(d.getMinutes())}`;
+        }
+        const normRut = (v) => String(v == null ? '' : v).replace(/[\.\s]/g, '').toUpperCase();
+        const normFicha = (v) => String(v == null ? '' : v).trim().replace(/\.0+$/, '');
+
+        // Semanas de gestación: Diagnóstico -> Dx pediátrico -> Dx egreso
+        function parseGestacion(row) {
+            const sources = [
+                [row.diag, [/(\d{2})(?:\s*\+\s*\d)?\s*(?:SEM|SEMANAS|SEAMANAS)/i, /EMB\w*\.?\s*(?:DE\s*)?(\d{2})/i]],
+                [row.diagPed, [/(\d{2})(?:\s*\+\s*\d)?\s*(?:SEM|SEA|S\b)/i, /(?:RNT|RNPT|RN\s*PT|RN)\s*\w*\s*(\d{2})/i]],
+                [row.diagEgr, [/(\d{2})\s*(?:SEM|SEMANAS)/i]]
+            ];
+            for (const [txt, pats] of sources) for (const p of pats) {
+                const mt = String(txt || '').match(p);
+                if (mt) { const w = parseInt(mt[1], 10); if (w >= 20 && w <= 44) return w; }
+            }
+            return null;
+        }
+
+        // APGAR "91010" = 9/10/10. Misma regla del Libro Mater: algún valor <=1 -> RN fallecido (2)
+        function condIngreso(apgar) {
+            const v = (String(apgar == null ? '' : apgar).match(/10|\d/g) || []).map(Number);
+            if (!v.length) return { code: '1', warn: 'sin APGAR' };
+            if (Math.min(...v) <= 1) return { code: '2', warn: 'APGAR ' + apgar + ' -> Fallecido, revisar' };
+            return { code: '1', warn: '' };
+        }
+
+        // Resumen del parto (el mismo del botón Copiar del Libro Mater), en una sola línea: el TXT no admite saltos de línea ni '|'
+        const SIDEBAR_SEP = ' // ';
+        function buildSidebarParto(list, wk) {
+            const b = list[0], v = (x) => String(x == null ? '' : x).replace(/\s+/g, ' ').trim();
+            const L = [`Ficha: ${b.ficha}`, `Nombre: ${v(b.nombre)}`, `Rut: ${b.rut}`, `Nacionalidad: ${v(b.nac)}`, `Etnia: ${v(b.etnia)}`,
+                `Diagnóstico: ${v(b.diag)}`, `Diagnóstico Egreso: ${v(b.diagEgr)}`, `Tipo Anestesia: ${v(b.anest)}`, `Tipo Parto: ${v(b.tparto)}`, `Causa: ${v(b.causa)}`,
+                `Fecha Parto: ${fmtDT(b.dt)}`, `Tiempo de Gestación: ${wk !== null ? wk + ' SEMANAS' : 'No determinada'}`];
+            list.slice(0, 4).forEach((r, k) => {
+                const p = list.length > 1 ? `RN${k + 1} ` : '', cd = condIngreso(r.apgar).code;
+                L.push(`${p}Peso RN: ${r.peso ?? ''}`, `${p}Sexo: ${r.sexo === '01' ? '01 - Hombre' : r.sexo === '02' ? '02 - Mujer' : 'Indeterminado'}`,
+                       `${p}APGAR: ${v(r.apgar)}`, `${p}Condición de Ingreso: ${cd === '2' ? '2 - Fallecido' : '1 - Vivo'}`);
+            });
+            L.push(`Matrona a Cargo: ${v(b.matrona)}`);
+            return L.join(SIDEBAR_SEP).replace(/\|/g, '/');
+        }
+
+        // --- PAÍS (Norma EIS DEIS-MINSAL / ISO 3166-1 numérico, 3 dígitos con ceros) ---
+        const PAIS_ISO = [
+            ['004', 'Afganistán'],
+            ['008', 'Albania'],
+            ['010', 'Antártida'],
+            ['012', 'Argelia'],
+            ['016', 'Samoa Americana'],
+            ['020', 'Andorra'],
+            ['024', 'Angola'],
+            ['028', 'Antigua y Barbuda'],
+            ['031', 'Azerbaiyán'],
+            ['032', 'Argentina'],
+            ['036', 'Australia'],
+            ['040', 'Austria'],
+            ['044', 'Bahamas'],
+            ['048', 'Baréin'],
+            ['050', 'Bangladés'],
+            ['051', 'Armenia'],
+            ['052', 'Barbados'],
+            ['056', 'Bélgica'],
+            ['060', 'Bermudas'],
+            ['064', 'Bután'],
+            ['068', 'Bolivia'],
+            ['070', 'Bosnia y Herzegovina'],
+            ['072', 'Botsuana'],
+            ['074', 'Isla Bouvet'],
+            ['076', 'Brasil'],
+            ['084', 'Belice'],
+            ['086', 'Territorio Británico del Océano Índico'],
+            ['090', 'Islas Salomón'],
+            ['092', 'Islas Vírgenes Británicas'],
+            ['096', 'Brunéi'],
+            ['100', 'Bulgaria'],
+            ['104', 'Myanmar'],
+            ['108', 'Burundi'],
+            ['112', 'Bielorrusia'],
+            ['116', 'Camboya'],
+            ['120', 'Camerún'],
+            ['124', 'Canadá'],
+            ['132', 'Cabo Verde'],
+            ['136', 'Islas Caimán'],
+            ['140', 'República Centroafricana'],
+            ['144', 'Sri Lanka'],
+            ['148', 'Chad'],
+            ['152', 'Chile'],
+            ['156', 'China'],
+            ['158', 'Taiwán'],
+            ['162', 'Isla de Navidad'],
+            ['166', 'Islas Cocos'],
+            ['170', 'Colombia'],
+            ['174', 'Comoras'],
+            ['175', 'Mayotte'],
+            ['178', 'Congo'],
+            ['180', 'Congo (República Democrática)'],
+            ['184', 'Islas Cook'],
+            ['188', 'Costa Rica'],
+            ['191', 'Croacia'],
+            ['192', 'Cuba'],
+            ['196', 'Chipre'],
+            ['203', 'Chequia'],
+            ['204', 'Benín'],
+            ['208', 'Dinamarca'],
+            ['212', 'Dominica'],
+            ['214', 'República Dominicana'],
+            ['218', 'Ecuador'],
+            ['222', 'El Salvador'],
+            ['226', 'Guinea Ecuatorial'],
+            ['231', 'Etiopía'],
+            ['232', 'Eritrea'],
+            ['233', 'Estonia'],
+            ['234', 'Islas Feroe'],
+            ['238', 'Islas Malvinas'],
+            ['239', 'Georgia del Sur y Sandwich del Sur'],
+            ['242', 'Fiyi'],
+            ['246', 'Finlandia'],
+            ['248', 'Islas Åland'],
+            ['250', 'Francia'],
+            ['254', 'Guayana Francesa'],
+            ['258', 'Polinesia Francesa'],
+            ['260', 'Territorios Australes Franceses'],
+            ['262', 'Yibuti'],
+            ['266', 'Gabón'],
+            ['268', 'Georgia'],
+            ['270', 'Gambia'],
+            ['275', 'Palestina'],
+            ['276', 'Alemania'],
+            ['288', 'Ghana'],
+            ['292', 'Gibraltar'],
+            ['296', 'Kiribati'],
+            ['300', 'Grecia'],
+            ['304', 'Groenlandia'],
+            ['308', 'Granada'],
+            ['312', 'Guadalupe'],
+            ['316', 'Guam'],
+            ['320', 'Guatemala'],
+            ['324', 'Guinea'],
+            ['328', 'Guyana'],
+            ['332', 'Haití'],
+            ['334', 'Islas Heard y McDonald'],
+            ['336', 'Santa Sede'],
+            ['340', 'Honduras'],
+            ['344', 'Hong Kong'],
+            ['348', 'Hungría'],
+            ['352', 'Islandia'],
+            ['356', 'India'],
+            ['360', 'Indonesia'],
+            ['364', 'Irán'],
+            ['368', 'Irak'],
+            ['372', 'Irlanda'],
+            ['376', 'Israel'],
+            ['380', 'Italia'],
+            ['384', 'Costa de Marfil'],
+            ['388', 'Jamaica'],
+            ['392', 'Japón'],
+            ['398', 'Kazajistán'],
+            ['400', 'Jordania'],
+            ['404', 'Kenia'],
+            ['408', 'Corea del Norte'],
+            ['410', 'Corea del Sur'],
+            ['414', 'Kuwait'],
+            ['417', 'Kirguistán'],
+            ['418', 'Laos'],
+            ['422', 'Líbano'],
+            ['426', 'Lesoto'],
+            ['428', 'Letonia'],
+            ['430', 'Liberia'],
+            ['434', 'Libia'],
+            ['438', 'Liechtenstein'],
+            ['440', 'Lituania'],
+            ['442', 'Luxemburgo'],
+            ['446', 'Macao'],
+            ['450', 'Madagascar'],
+            ['454', 'Malaui'],
+            ['458', 'Malasia'],
+            ['462', 'Maldivas'],
+            ['466', 'Malí'],
+            ['470', 'Malta'],
+            ['474', 'Martinica'],
+            ['478', 'Mauritania'],
+            ['480', 'Mauricio'],
+            ['484', 'México'],
+            ['492', 'Mónaco'],
+            ['496', 'Mongolia'],
+            ['498', 'Moldavia'],
+            ['499', 'Montenegro'],
+            ['500', 'Montserrat'],
+            ['504', 'Marruecos'],
+            ['508', 'Mozambique'],
+            ['512', 'Omán'],
+            ['516', 'Namibia'],
+            ['520', 'Nauru'],
+            ['524', 'Nepal'],
+            ['528', 'Países Bajos'],
+            ['531', 'Curazao'],
+            ['533', 'Aruba'],
+            ['534', 'San Martín (parte neerlandesa)'],
+            ['535', 'Bonaire, San Eustaquio y Saba'],
+            ['540', 'Nueva Caledonia'],
+            ['548', 'Vanuatu'],
+            ['554', 'Nueva Zelanda'],
+            ['558', 'Nicaragua'],
+            ['562', 'Níger'],
+            ['566', 'Nigeria'],
+            ['570', 'Niue'],
+            ['574', 'Isla Norfolk'],
+            ['578', 'Noruega'],
+            ['580', 'Islas Marianas del Norte'],
+            ['581', 'Islas Ultramarinas Menores de Estados Unidos'],
+            ['583', 'Micronesia'],
+            ['584', 'Islas Marshall'],
+            ['585', 'Palaos'],
+            ['586', 'Pakistán'],
+            ['591', 'Panamá'],
+            ['598', 'Papúa Nueva Guinea'],
+            ['600', 'Paraguay'],
+            ['604', 'Perú'],
+            ['608', 'Filipinas'],
+            ['612', 'Pitcairn'],
+            ['616', 'Polonia'],
+            ['620', 'Portugal'],
+            ['624', 'Guinea-Bisáu'],
+            ['626', 'Timor-Leste'],
+            ['630', 'Puerto Rico'],
+            ['634', 'Catar'],
+            ['638', 'Reunión'],
+            ['642', 'Rumania'],
+            ['643', 'Rusia'],
+            ['646', 'Ruanda'],
+            ['652', 'San Bartolomé'],
+            ['654', 'Santa Elena'],
+            ['659', 'San Cristóbal y Nieves'],
+            ['660', 'Anguila'],
+            ['662', 'Santa Lucía'],
+            ['663', 'San Martín (parte francesa)'],
+            ['666', 'San Pedro y Miquelón'],
+            ['670', 'San Vicente y las Granadinas'],
+            ['674', 'San Marino'],
+            ['678', 'Santo Tomé y Príncipe'],
+            ['682', 'Arabia Saudita'],
+            ['686', 'Senegal'],
+            ['688', 'Serbia'],
+            ['690', 'Seychelles'],
+            ['694', 'Sierra Leona'],
+            ['702', 'Singapur'],
+            ['703', 'Eslovaquia'],
+            ['704', 'Vietnam'],
+            ['705', 'Eslovenia'],
+            ['706', 'Somalia'],
+            ['710', 'Sudáfrica'],
+            ['716', 'Zimbabue'],
+            ['724', 'España'],
+            ['728', 'Sudán del Sur'],
+            ['729', 'Sudán'],
+            ['732', 'Sahara Occidental'],
+            ['740', 'Surinam'],
+            ['744', 'Svalbard y Jan Mayen'],
+            ['748', 'Esuatini'],
+            ['752', 'Suecia'],
+            ['756', 'Suiza'],
+            ['760', 'Siria'],
+            ['762', 'Tayikistán'],
+            ['764', 'Tailandia'],
+            ['768', 'Togo'],
+            ['772', 'Tokelau'],
+            ['776', 'Tonga'],
+            ['780', 'Trinidad y Tobago'],
+            ['784', 'Emiratos Árabes Unidos'],
+            ['788', 'Túnez'],
+            ['792', 'Turquía'],
+            ['795', 'Turkmenistán'],
+            ['796', 'Islas Turcas y Caicos'],
+            ['798', 'Tuvalu'],
+            ['800', 'Uganda'],
+            ['804', 'Ucrania'],
+            ['807', 'Macedonia del Norte'],
+            ['818', 'Egipto'],
+            ['826', 'Reino Unido'],
+            ['831', 'Guernsey'],
+            ['832', 'Jersey'],
+            ['833', 'Isla de Man'],
+            ['834', 'Tanzania'],
+            ['840', 'Estados Unidos de América'],
+            ['850', 'Islas Vírgenes de los Estados Unidos'],
+            ['854', 'Burkina Faso'],
+            ['858', 'Uruguay'],
+            ['860', 'Uzbekistán'],
+            ['862', 'Venezuela'],
+            ['876', 'Wallis y Futuna'],
+            ['882', 'Samoa'],
+            ['887', 'Yemen'],
+            ['894', 'Zambia']
+        ];
+        const paisKey = (v) => String(v == null ? '' : v).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+        const PAIS_MAP = new Map(PAIS_ISO.map(([c, n]) => [paisKey(n), c]));
+        // Sinónimos y gentilicios habituales en el Libro de Partos
+        [['chilena', '152'], ['chileno', '152'], ['boliviana', '068'], ['boliviano', '068'], ['bolivia estado plurinacional de', '068'],
+         ['peruana', '604'], ['peruano', '604'], ['colombiana', '170'], ['colombiano', '170'], ['venezolana', '862'], ['venezolano', '862'],
+         ['venezuela republica bolivariana de', '862'], ['argentina', '032'], ['argentino', '032'], ['ecuatoriana', '218'], ['ecuatoriano', '218'],
+         ['paraguaya', '600'], ['paraguayo', '600'], ['uruguaya', '858'], ['uruguayo', '858'], ['brasilena', '076'], ['brasileno', '076'], ['brazil', '076'],
+         ['haitiana', '332'], ['haitiano', '332'], ['haiti', '332'], ['dominicana', '214'], ['dominicano', '214'], ['rep dominicana', '214'],
+         ['cubana', '192'], ['cubano', '192'], ['mexicana', '484'], ['mexicano', '484'], ['espanola', '724'], ['espanol', '724'],
+         ['estados unidos', '840'], ['eeuu', '840'], ['usa', '840'], ['china', '156'], ['china republica popular', '156'], ['francesa', '250'], ['frances', '250'],
+         ['corea', '410'], ['republica de corea', '410'], ['rusia federacion de', '643'], ['reino unido de gran bretana e irlanda del norte', '826']
+        ].forEach(([k, c]) => PAIS_MAP.set(paisKey(k), c));
+        const paisCodigo = (nac) => PAIS_MAP.get(paisKey(nac)) || null;
+
+        function loadPartoFile(file) {
+            if (!file || !/\.xlsx?$/i.test(file.name)) { alert('Seleccione el Libro de Partos (.xlsx)'); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
+                    let hi = rows.findIndex(r => { const t = r.map(x => String(x).toLowerCase().trim()); return t.includes('rut') && t.includes('ficha') && t.includes('nombre'); });
+                    if (hi < 0) throw new Error('No se encontró la cabecera (Rut, Ficha, Nombre)');
+                    const H = rows[hi].map(x => String(x || '').trim().toLowerCase());
+                    const col = (n) => H.indexOf(n.toLowerCase());
+                    const C = { rut: col('rut'), ficha: col('ficha'), nombre: col('nombre'), diag: col('diagnostico'), diagEgr: col('diagnostico egreso'), diagPed: col('diagnostico pediatrico'),
+                                fnac: col('fecha nacimiento'), hnac: col('hora nacimiento'), peso: col('rn_peso'), sexo: col('rn_sexo'), apgar: col('apgar'),
+                                tparto: col('tipo parto'), anest: col('tipo anestesia'), nac: col('nacionalidad'), etnia: col('etnia'), causa: col('causa'), matrona: col('matrona a cargo') };
+                    ['rut', 'ficha', 'fnac', 'hnac', 'peso', 'sexo'].forEach(k => { if (C[k] < 0) throw new Error('Falta la columna del libro: ' + k); });
+                    const births = [], seen = new Set();
+                    for (let i = hi + 1; i < rows.length; i++) {
+                        const r = rows[i]; if (!r || !normRut(r[C.rut])) continue;
+                        const dt = partoDate(r[C.fnac], r[C.hnac]);
+                        const peso = parseInt(r[C.peso], 10);
+                        const sx = String(r[C.sexo] || '').toUpperCase();
+                        const b = { rut: normRut(r[C.rut]), ficha: normFicha(r[C.ficha]), nombre: String(r[C.nombre] || '').trim(), dt, peso: isNaN(peso) ? null : peso,
+                                    sexo: sx.startsWith('M') ? '01' : sx.startsWith('F') ? '02' : '', apgar: r[C.apgar],
+                                    diag: r[C.diag], diagEgr: C.diagEgr > -1 ? r[C.diagEgr] : '', diagPed: C.diagPed > -1 ? r[C.diagPed] : '',
+                                    tparto: C.tparto > -1 ? r[C.tparto] : '', anest: C.anest > -1 ? r[C.anest] : '', row: i + 1,
+                                    nac: C.nac > -1 ? r[C.nac] : '', etnia: C.etnia > -1 ? r[C.etnia] : '', causa: C.causa > -1 ? r[C.causa] : '', matrona: C.matrona > -1 ? r[C.matrona] : '' };
+                        b.incompleto = !dt || (b.peso === null && !b.sexo);
+                        const key = b.ficha + '|' + (dt ? dt.getTime() : 'x') + '|' + b.peso + '|' + b.sexo;
+                        if (!b.incompleto) { if (seen.has(key)) continue; seen.add(key); }   // fila duplicada exacta
+                        births.push(b);
+                    }
+                    // fila incompleta que tiene otra fila completa de la misma ficha = relleno, se descarta
+                    const completas = new Set(births.filter(b => !b.incompleto).map(b => b.ficha));
+                    partoBook = { births: births.filter(b => !b.incompleto || !completas.has(b.ficha)), fileName: file.name };
+                    pEls.icon.innerText = 'check_circle'; pEls.icon.classList.remove('text-slate-400'); pEls.icon.classList.add('text-emerald-500');
+                    pEls.title.innerText = 'Libro de Partos cargado: ' + partoBook.births.length + ' registros'; pEls.sub.innerText = file.name;
+                    pEls.clear.classList.remove('hidden');
+                } catch (err) { console.error(err); alert('Error leyendo el libro: ' + err.message); resetPartoUI(); }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // --- LIBRO DE PARTOS: cruce con los episodios del TXT ---
+        function crossPartoBook(records, header) {
+            partoReport = { ok: 0, sin: [] };
+            if (!partoBook) return;
+            const idx = (n, d) => { const k = header.findIndex(h => h.trim().toUpperCase() === n); return k > -1 ? k : d; };
+            const I = { fecpart: idx('FECPART', 20), tgest: idx('TGESTAC', 21),
+                        peso: [22, 24, 26, 28].map((d, k) => idx('RN_PESO_0' + (k + 1), d)), sexo: [23, 25, 27, 29].map((d, k) => idx('RN_SEXO_0' + (k + 1), d)),
+                        cond: [45, 46, 47, 48].map((d, k) => idx('RN_COND_ING_0' + (k + 1), d)),
+                        pais: idx('PAIS', COL_MAP.PAIS), serving: idx('SERVING', 14), servalt: idx('SERVALT', 15), tiping: idx('TIPING', 6), tact: idx('TIPO_ACTIVIDAD', 35), sb1: idx('SIDEBAR1_TEXTO', COL_MAP.NOTA + 1), sb2: idx('SIDEBAR2_TEXTO', COL_MAP.NOTA + 2) };
+            const byRut = new Map(), byFicha = new Map();
+            records.forEach(r => {
+                const rut = normRut(r.c[COL_MAP.CIP]), fi = normFicha(r.c[COL_MAP.HISTORIA]);
+                if (rut) { if (!byRut.has(rut)) byRut.set(rut, []); byRut.get(rut).push(r); }
+                if (fi) { if (!byFicha.has(fi)) byFicha.set(fi, []); byFicha.get(fi).push(r); }
+            });
+            const H = 36e5, assigned = new Map();     // record -> [births]
+            partoBook.births.forEach(b => {
+                if (b.incompleto) { partoReport.sin.push({ b, why: 'Fila del libro sin fecha/datos de parto' }); return; }
+                let cands = (byRut.get(b.rut) || []).slice();
+                if (!cands.length) cands = (byFicha.get(b.ficha) || []).slice();
+                if (!cands.length) { partoReport.sin.push({ b, why: 'Madre no está en este TXT (ver mes siguiente)' }); return; }
+                let pick = cands.find(r => r.ing && r.alt && r.ing <= new Date(b.dt.getTime() + H) && r.alt >= new Date(b.dt.getTime() - H));
+                let warn = '';
+                if (!pick) {   // tolerancia por día calendario (excluye traslados TIPALT 4)
+                    const day = new Date(b.dt.getFullYear(), b.dt.getMonth(), b.dt.getDate()).getTime();
+                    pick = cands.find(r => r.ing && r.alt && String(r.c[COL_MAP.TIPALT]).trim() !== '4' &&
+                        new Date(r.ing.getFullYear(), r.ing.getMonth(), r.ing.getDate()).getTime() <= day + 864e5 &&
+                        new Date(r.alt.getFullYear(), r.alt.getMonth(), r.alt.getDate()).getTime() >= day);
+                    if (pick) warn = 'hora de parto fuera de ingreso-alta';
+                }
+                if (!pick) { partoReport.sin.push({ b, why: 'El episodio de la madre que cubre el parto no está en este TXT (¿alta en el mes siguiente?)' }); return; }
+                b.warn = warn;
+                if (!assigned.has(pick)) assigned.set(pick, []);
+                assigned.get(pick).push(b);
+            });
+            assigned.forEach((list, r) => {
+                list.sort((a, z) => a.dt - z.dt);
+                const c = r.c, notes = [];
+                c[I.fecpart] = fmtDT(list[0].dt);
+                const wk = parseGestacion(list[0]);
+                if (wk !== null) c[I.tgest] = String(wk); else notes.push('sin semanas');
+                list.slice(0, 4).forEach((b, k) => {
+                    if (b.peso !== null) c[I.peso[k]] = String(b.peso);
+                    if (b.sexo) c[I.sexo[k]] = b.sexo;
+                    const cd = condIngreso(b.apgar); c[I.cond[k]] = cd.code; if (cd.warn) notes.push('RN' + (k + 1) + ': ' + cd.warn);
+                    if (b.warn) notes.push(b.warn);
+                });
+                if (list.length > 4) notes.push('más de 4 RN, se cargaron 4');
+                // Egreso con RN: valores fijos + resumen del parto en SIDEBAR1_TEXTO
+                c[I.serving] = '20-161'; c[I.servalt] = '20-161'; c[I.tiping] = '4'; c[I.tact] = '1';
+                c[I.sb1] = buildSidebarParto(list, wk);
+                // Nacionalidad del libro -> PAIS (código ISO de 3 dígitos). Si no se reconoce, no se toca y se avisa.
+                const nacLibro = String(list[0].nac || '').trim();
+                if (nacLibro) {
+                    const pc = paisCodigo(nacLibro);
+                    if (pc) { if (c[I.pais] !== pc) notes.push(`PAIS ${c[I.pais] || 'vacío'} → ${pc} (${nacLibro})`); c[I.pais] = pc; }
+                    else notes.push(`nacionalidad no reconocida: "${nacLibro}" — PAIS sin cambio`);
+                }
+                // Anestesia epidural (según SIDEBAR1_TEXTO): PROGRAMA = 6 y observación en SIDEBAR2_TEXTO
+                if (/Tipo Anestesia:\s*Epidural/i.test(c[I.sb1])) { c[COL_MAP.PROGRAMA] = '06'; c[I.sb2] = 'Tipo Anestesia: EPIDURAL'; }   // PROGRAMA con 2 dígitos, como el resto del archivo
+                r.mod.parto = 1;
+                r.partoInfo = `Parto ${fmtDT(list[0].dt)} · ${wk !== null ? wk + ' sem' : 's/sem'} · ` +
+                    list.map((b, k) => `RN${k + 1}: ${b.peso ?? '?'}g ${b.sexo === '01' ? 'H' : b.sexo === '02' ? 'M' : '?'}`).join(' · ') + (notes.length ? ' ⚠ ' + notes.join('; ') : '');
+                partoReport.ok += list.length;
+            });
+        }
+
+        // --- LIBRO DE PABELLÓN: carga ---
+        const bEls = { zone: document.getElementById('pablib-drop-zone'), input: document.getElementById('pablib-file-input'), icon: document.getElementById('pablib-drop-icon'),
+                       title: document.getElementById('pablib-drop-title'), sub: document.getElementById('pablib-drop-sub'), clear: document.getElementById('pablib-clear') };
+        bEls.zone.addEventListener('dragover', (e) => { e.preventDefault(); });
+        bEls.zone.addEventListener('drop', (e) => { e.preventDefault(); loadPabFile(e.dataTransfer.files[0]); });
+        bEls.input.addEventListener('change', (e) => loadPabFile(e.target.files[0]));
+        bEls.clear.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); resetPabUI(); });
+
+        function resetPabUI() {
+            pabBook = null; bEls.input.value = '';
+            bEls.icon.innerText = 'medical_services'; bEls.icon.classList.remove('text-emerald-500'); bEls.icon.classList.add('text-slate-400');
+            bEls.title.innerText = 'Cargar Libro de Pabellón (opcional)'; bEls.sub.innerText = '.xlsx · AMBULATORIO + Rev. CMA de cualquier ámbito · RUT + Ficha + fecha/hora pabellón → SIDEBAR 1-3';
+            bEls.clear.classList.add('hidden');
+        }
+
+        // RUT para identidad: sin puntos/espacios, sin ceros a la izquierda ("09550740-9" = "9550740-9")
+        const idRut = (v) => { const r = normRut(v); const [b, d = ''] = r.split('-'); return b.replace(/^0+/, '') + '-' + d; };
+        const z2 = (n) => String(n).padStart(2, '0');
+        const flat = (v) => String(v == null ? '' : v).replace(/[\r\n]+/g, ' ').replace(/\|/g, '/').replace(/\s+/g, ' ').trim();
+        const nameKey = (v) => String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z\s]/g, ' ').split(/\s+/).filter(Boolean).sort().join(' ');
+
+        // Fecha_Solicit -> 'YYYY-MM-DD' (texto ISO, dd/mm/yyyy o serial Excel)
+        function pabDay(v) {
+            if (typeof v === 'number') { const d = new Date(Math.round((v - 25569) * 864e5)); return `${d.getUTCFullYear()}-${z2(d.getUTCMonth() + 1)}-${z2(d.getUTCDate())}`; }
+            const t = String(v || '').trim(); let m;
+            if ((m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return `${m[1]}-${z2(m[2])}-${z2(m[3])}`;
+            if ((m = t.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/))) return `${m[3]}-${z2(m[2])}-${z2(m[1])}`;
+            return '';
+        }
+        function pabHour(v) {
+            if (typeof v === 'number') { const t = Math.round((v % 1) * 1440); return `${z2(Math.floor(t / 60) % 24)}:${z2(t % 60)}`; }
+            const m = String(v || '').match(/(\d{1,2}):(\d{2})/); return m ? `${z2(m[1])}:${m[2]}` : '';
+        }
+
+        function loadPabFile(file) {
+            if (!file || !/\.xlsx?$/i.test(file.name)) { alert('Seleccione el Libro de Pabellón (.xlsx)'); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
+                    const hi = rows.findIndex(r => { const t = r.map(x => String(x).toLowerCase().trim()); return t.includes('rut') && t.includes('ficha') && t.includes('fecha_solicit'); });
+                    if (hi < 0) throw new Error('No se encontró la cabecera (Rut, Ficha, Fecha_Solicit)');
+                    const H = rows[hi].map(x => String(x || '').trim().toLowerCase());
+                    const col = (n) => H.indexOf(n.toLowerCase());
+                    const C = { sol: col('solicitud'), nombre: col('nombrepaciente'), rut: col('rut'), ficha: col('ficha'), fecha: col('fecha_solicit'), hora: col('hora_ingreso'),
+                                cod: col('codigo_int'), desc: col('descripcion_int'), ambito: col('ambito'), diag: col('diag. post operatorio'), op: col('operación realizada') };
+                    Object.entries(C).forEach(([k, v]) => { if (v < 0) throw new Error('Falta la columna del libro de pabellón: ' + k); });
+                    const out = []; let total = 0;
+                    for (let i = hi + 1; i < rows.length; i++) {
+                        const r = rows[i]; if (!r || !String(r[C.rut] || '').trim()) continue;
+                        total++;
+                        const ambito = String(r[C.ambito]).trim().toUpperCase();
+                        out.push({ ambito, amb: ambito === 'AMBULATORIO', sol: String(r[C.sol]).trim(), nombre: flat(r[C.nombre]), rutTxt: String(r[C.rut]).trim(), rut: idRut(r[C.rut]), ficha: normFicha(r[C.ficha]),
+                                   day: pabDay(r[C.fecha]), hora: pabHour(r[C.hora]), cod: flat(r[C.cod]), desc: flat(r[C.desc]), diag: flat(r[C.diag]), op: flat(r[C.op]), row: i + 1 });
+                    }
+                    pabBook = { rows: out, fileName: file.name };
+                    bEls.icon.innerText = 'check_circle'; bEls.icon.classList.remove('text-slate-400'); bEls.icon.classList.add('text-emerald-500');
+                    bEls.title.innerText = `Libro de Pabellón cargado: ${out.filter(p => p.amb).length} ambulatorios + ${out.filter(p => !p.amb).length} otros ámbitos (solo para Rev. CMA)`; bEls.sub.innerText = file.name;
+                    bEls.clear.classList.remove('hidden');
+                } catch (err) { console.error(err); alert('Error leyendo el libro de pabellón: ' + err.message); resetPabUI(); }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // --- LIBRO DE PABELLÓN: cruce estricto (RUT + Ficha + fecha + hora de pabellón deben coincidir) ---
+        function crossPabBook(records, header) {
+            pabReport = { ok: 0, sin: [] };
+            if (!pabBook) return;
+            const idx = (n, d) => { const k = header.findIndex(h => h.trim().toUpperCase() === n); return k > -1 ? k : d; };
+            const S = [1, 2, 3].map(k => idx('SIDEBAR' + k + '_TEXTO', COL_MAP.NOTA + k));
+            const byRutDay = new Map(), byFichaDay = new Map(), used = new Set();
+            records.forEach(r => {
+                const fi = String(r.c[COL_MAP.FEC_INT_1] || '').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+                if (!fi) return;
+                r._pabDay = `${fi[3]}-${z2(fi[2])}-${z2(fi[1])}`; r._pabHour = fi[4] ? `${z2(fi[4])}:${fi[5]}` : '';
+                const kr = idRut(r.c[COL_MAP.CIP]) + '|' + r._pabDay, kf = normFicha(r.c[COL_MAP.HISTORIA]) + '|' + r._pabDay;
+                if (!byRutDay.has(kr)) byRutDay.set(kr, []); byRutDay.get(kr).push(r);
+                if (!byFichaDay.has(kf)) byFichaDay.set(kf, []); byFichaDay.get(kf).push(r);
+            });
+            const isCma = (r) => String(r.c[COL_MAP.NOTA] || '').includes('Rev. CMA');
+            const isPab24 = (r) => { const n = String(r.c[COL_MAP.NOTA] || ''); return n.includes('Pab Qx Ux <24h') || n.includes('Pab Qx <24h'); };
+
+            // Devuelve { r } si RUT + Ficha + fecha + hora identifican un único episodio libre; si no, { why }
+            const matchOne = (p, onlyCma) => {   // onlyCma: false = todos, o filtro de episodios elegibles
+                if (!p.day) return { why: 'Libro sin Fecha_Solicit válida' };
+                let byRut = byRutDay.get(p.rut + '|' + p.day) || [];
+                if (onlyCma) byRut = byRut.filter(onlyCma);
+                if (!byRut.length) {
+                    let byFi = byFichaDay.get(p.ficha + '|' + p.day) || [];
+                    if (onlyCma) byFi = byFi.filter(onlyCma);
+                    return { why: byFi.length ? `RUT no coincide (TXT: ${byFi[0].c[COL_MAP.CIP] || 'VACÍO'}) — no se carga` : 'Sin episodio con esa fecha de pabellón en este TXT', none: !byFi.length };
+                }
+                const cands = byRut.filter(r => normFicha(r.c[COL_MAP.HISTORIA]) === p.ficha);
+                if (!cands.length) return { why: `Ficha no coincide (TXT: ${byRut[0].c[COL_MAP.HISTORIA]}) — no se carga` };
+                let exact = cands.filter(r => r._pabHour === p.hora);
+                if (exact.length > 1) {   // desempate: el episodio cuyo ingreso-alta ORIGINAL contiene la hora del pabellón
+                    const inEp = exact.filter(r => r.ing0 && r.alt0 && r.pabDate && r.ing0 <= r.pabDate && r.pabDate <= r.alt0);   // fechas originales del TXT
+                    if (inEp.length === 1) exact = inEp;
+                }
+                if (!exact.length) return { why: `Hora de pabellón distinta (TXT ${cands[0]._pabHour || 's/hora'} vs libro ${p.hora || 's/hora'}) — no se carga` };
+                if (exact.length > 1) return { why: 'Más de un episodio con mismo RUT, ficha y hora — no se carga' };
+                const r = exact[0];
+                if (used.has(r)) return { why: `Segunda intervención para el episodio ${r.c[COL_MAP.EPISODIO]} — no se sobrescribe`, dup: true };
+                if (S.some(i => String(r.c[i] || '').trim())) return { why: `Episodio ${r.c[COL_MAP.EPISODIO]} ya tiene SIDEBAR (p.ej. parto) — no se sobrescribe` };
+                return { r };
+            };
+
+            const apply = (p, r, pass) => {
+                const c = r.c;
+                used.add(r);
+                c[S[0]] = flat(`${p.nombre}----${p.rutTxt}----${p.ficha} --- ***MAI : ${p.cod}*** ${p.desc}`);
+                c[S[1]] = flat(`Operación Realizada ---- ${p.op}`);
+                c[S[2]] = flat(`Diag. Post Operatorio ---- ${p.diag}`);
+                const warns = [];
+                if (nameKey(p.nombre) !== nameKey(r.fullName)) warns.push(`nombre TXT: ${r.fullName}`);
+                const nota = String(c[COL_MAP.NOTA] || '').includes('Pab Qx Ux <24h') ? 'Pab Qx Ux <24h' : 'Pab Qx <24h';
+                const tag = pass === 1 ? (isCma(r) ? '✓ Rev. CMA' : 'sin Rev. CMA') : pass === 2 ? `2ª pasada · Ámbito libro: ${p.ambito} ✓ Rev. CMA` : `3ª pasada · Ámbito libro: ${p.ambito} ✓ ${nota}`;
+                r.mod.pablib = 1;
+                r.pabInfo = `${tag} · MAI ${p.cod} ${p.desc} · ${p.day.split('-').reverse().join('/')} ${p.hora}` + (warns.length ? ' ⚠ ' + warns.join('; ') : '');
+                if (pass === 1) pabReport.ok++; else if (pass === 2) pabReport.ok2++; else pabReport.ok3++;
+            };
+
+            // 1ª pasada: solo Ámbito AMBULATORIO
+            pabReport.ok2 = 0; pabReport.ok3 = 0; pabReport.cmaSin = [];
+            pabBook.rows.filter(p => p.amb).forEach(p => {
+                const m = matchOne(p, false);
+                if (m.r) apply(p, m.r, 1); else pabReport.sin.push({ p, why: m.why });
+            });
+
+            // 2ª pasada: egresos que siguen como "Rev. CMA" sin cruce -> cualquier ámbito (Hospitalizado, Urgencia...), misma identidad estricta
+            pabBook.rows.filter(p => !p.amb).forEach(p => {
+                const m = matchOne(p, isCma);
+                if (m.r) apply(p, m.r, 2);
+                else if (!m.none && !m.dup) pabReport.sin.push({ p, why: '2ª pasada Rev. CMA: ' + m.why });
+            });
+
+            // 3ª pasada: egresos con nota "Pab Qx Ux <24h" / "Pab Qx <24h" aún sin cruce -> cualquier ámbito, misma identidad estricta
+            pabBook.rows.filter(p => !p.amb).forEach(p => {
+                const m = matchOne(p, (r) => isPab24(r) && !r.mod.pablib);
+                if (m.r) apply(p, m.r, 3);
+                else if (!m.none && !m.dup) pabReport.sin.push({ p, why: '3ª pasada Pab <24h: ' + m.why });
+            });
+
+            // Lo que aún queda como Rev. CMA / Pab <24h sin cruce
+            records.filter(r => (isCma(r) || isPab24(r)) && !r.mod.pablib).forEach(r => {
+                const rut = idRut(r.c[COL_MAP.CIP]), fi = normFicha(r.c[COL_MAP.HISTORIA]);
+                const inBook = pabBook.rows.filter(p => p.rut === rut || p.ficha === fi);
+                const same = inBook.some(p => p.day === r._pabDay && p.hora === r._pabHour);
+                pabReport.cmaSin.push({ r, why: same ? 'fecha y hora coinciden con el libro, pero no pasa la validación de identidad (ver motivo en filas sin cruzar)' : inBook.length ? `en el libro con otra fecha/hora: ${[...new Set(inBook.map(p => p.day.split('-').reverse().join('/') + ' ' + p.hora))].join(', ')}` : 'no está en este libro de pabellón (¿otro mes?)' });
+            });
+        }
+
+        // --- 6. LOGIC ---
+        function loadFile(file) {
+            if (!file || !file.name.toLowerCase().endsWith('.txt')) { alert("Por favor seleccione un archivo .txt"); return; }
+            originalFileName = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                rawData = e.target.result;
+                els.dropIcon.innerText = 'check_circle'; els.dropIcon.classList.replace('text-slate-400', 'text-emerald-500'); els.dropIcon.classList.replace('dark:text-slate-500', 'dark:text-emerald-400');
+                els.dropTitle.innerHTML = `<span class="text-emerald-600 dark:text-emerald-400">Archivo Cargado</span>`;
+                els.dropSub.innerText = file.name; els.dropSub.className = "text-sm font-bold text-slate-800 dark:text-slate-200 mt-2 font-mono bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 px-4 py-1.5 rounded-full";
+                els.btnProcess.disabled = false; els.btnProcess.classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-slate-400', 'dark:text-slate-600', 'cursor-not-allowed', 'shadow-none');
+                els.btnProcess.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-indigo-600', 'hover:from-blue-500', 'hover:to-indigo-500', 'text-white', 'shadow-lg', 'hover:-translate-y-1', 'cursor-pointer');
+                els.btnClear.classList.remove('hidden');
+            };
+            reader.readAsText(file);
+        }
+
+        function clearData() {
+            rawData = null; processedData = null; deceasedList = []; rnList = []; allParsedRecords = [];
+            modData = { cleaned: [], rut: [], empty_rut: [], geo: [], pam: [], active: [], prev: [], pab: [], cma: [], qtx: [], hd: [], dialisis: [], dead: [], rn: [], out_pab: [], parto: [], pablib: [] };
+            els.fileInput.value = ''; els.dropIcon.innerText = 'upload_file'; els.dropIcon.className = "material-symbols-rounded text-6xl text-slate-400 dark:text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors";
+            els.dropTitle.innerText = "Cargar PPV-GRD"; els.dropSub.innerText = '.txt'; els.dropSub.className = "text-sm text-slate-500 dark:text-slate-400 mt-2 font-mono bg-white/60 dark:bg-black/30 px-4 py-1.5 rounded-full";
+            els.btnProcess.disabled = true; els.btnProcess.className = "w-full py-5 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-extrabold rounded-2xl flex items-center justify-center gap-3 text-xl transition-all shadow-none cursor-not-allowed";
+            els.btnClear.classList.add('hidden'); els.outputArea.classList.add('hidden');
+            els.statsBar.innerHTML = ''; els.tableBody.innerHTML = ''; partoReport = { ok: 0, sin: [] }; partoApplied = false; pabReport = { ok: 0, ok2: 0, ok3: 0, sin: [], cmaSin: [] }; pabApplied = false;
+        }
+
+        function parseDate(str) {
+            if (!str || !str.trim()) return null;
+            try {
+                const [dPart, tPart] = str.trim().split(' ');
+                const [d, m, y] = dPart.split(/[\/\-]/).map(Number);
+                const [hr, min] = tPart ? tPart.split(':').map(Number) : [0,0];
+                return new Date(y, m-1, d, hr, min);
+            } catch { return null; }
+        }       
+
+        function getAgeInfo(birth, admit) {
+            if(!birth || !admit) return { val: -1, text: '-', isChild: false };
+            let years = admit.getFullYear() - birth.getFullYear();
+            let m = admit.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && admit.getDate() < birth.getDate())) years--;
+            if (years > 0) return { val: years, text: `${years} Años`, isChild: years <= 18 };
+            let months = (admit.getFullYear() - birth.getFullYear()) * 12 + (admit.getMonth() - birth.getMonth());
+            if (admit.getDate() < birth.getDate()) months--;
+            if (months > 0) return { val: 0.1, text: `${months} Meses`, isChild: true };
+            const days = Math.floor((admit - birth) / (1000 * 60 * 60 * 24));
+            return { val: 0.01, text: `${days} Días`, isChild: true };
+        }
+
+        function processData() {
+            try {
+                if (!rawData) return;
+                const lines = rawData.split(/\r\n|\n/);
+                const F = {
+                    rut: els.checks.rut.checked, geo: els.checks.geo.checked, pam: els.checks.pam.checked, active: els.checks.active.checked,
+                    prev: els.checks.prev.checked, pab: els.checks.pab.checked, hd: els.checks.hd.checked, dialisis: els.checks.dialisis.checked,
+                    dead: els.checks.dead.checked, rn: els.checks.rn.checked, parto: els.checks.parto.checked, pablib: els.checks.pablib.checked, empty_rut: els.checks.empty_rut.checked, out_pab: els.checks.out_pab.checked
+                };
+
+                let header = lines[0].split('|');
+                
+                let nameIndices = { first: 41, ap1: 42, ap2: 43 };
+                
+                while(header.length <= COL_MAP.NOTA + 3) header.push('');
+                if(!header[COL_MAP.NOTA].trim()) header[COL_MAP.NOTA] = 'NOTA';
+                ['SIDEBAR1_TEXTO', 'SIDEBAR2_TEXTO', 'SIDEBAR3_TEXTO'].forEach((n, k) => { if (!header[COL_MAP.NOTA + 1 + k].trim()) header[COL_MAP.NOTA + 1 + k] = n; });
+
+                let records = [];
+                for(let i=1; i<lines.length; i++){
+                    if(!lines[i].trim()) continue;
+                    let c = lines[i].split('|');
+                    while(c.length <= COL_MAP.NOTA + 3) c.push('');
+                    c[49] = '1'; 
+
+                    const dob = parseDate(c[COL_MAP.FECNAC]);
+                    const ing = parseDate(c[COL_MAP.FECING]);
+                    const alt = parseDate(c[COL_MAP.FECALT]);
+                    const pabDate = parseDate(c[COL_MAP.FEC_INT_1]);
+                    const age = getAgeInfo(dob, ing);
+                    
+                    let nameArr = [];
+                    if(c[nameIndices.first]) nameArr.push(c[nameIndices.first]);
+                    if(c[nameIndices.ap1]) nameArr.push(c[nameIndices.ap1]);
+                    if(c[nameIndices.ap2]) nameArr.push(c[nameIndices.ap2]);
+                    let fullName = nameArr.join(' ').replace(/\s+/g,' ').trim() || "SIN NOMBRE";
+
+                    records.push({
+                        c: c, dob, ing, alt, pabDate, ing0: ing, alt0: alt, age, fullName,
+                        mod: { parto:0, pablib:0, rut:0, geo:0, pam:0, active:0, prev:0, pab:0, cma:0, qtx:0, hd:0, dialisis:0, dead:0, cleaned_serv:0, cleaned_tras:0, cat_ocp:0, empty_rut:0, out_pab:0 },
+                        stay: '', estadiaNum: -1, diffHours: '-', continuo: 'NO', idx: i 
+                    });
+                }
+
+                deceasedList = []; rnList = [];
+                modData = { cleaned: [], rut: [], empty_rut: [], geo: [], pam: [], active: [], prev: [], pab: [], cma: [], qtx: [], hd: [], dialisis: [], dead: [], rn: [], out_pab: [], parto: [], pablib: [] };
+
+                // Buscar columna PROC dinámicamente o forzar 34 (AI) si no la encuentra
+                let procIdx = header.findIndex(h => h.toUpperCase().trim() === 'PROC' || h.toUpperCase().trim() === 'PROCEDENCIA');
+                let idxProcSeguro = procIdx !== -1 ? procIdx : 34; 
+
+                records.forEach(row => {
+                    const c = row.c;
+                    const mod = row.mod;
+
+            // --- IDENTIFICAR DIÁLISIS ---
+            const medicosDialisis = [
+            "07601174-5", "7601174-5",
+            "16867943-2", 
+            "26871603-3", 
+            "08412417-6", "8412417-6", 
+            "29064072-5"
+        ];
+        let medicoFila = c[COL_MAP.MEDICOALT] ? c[COL_MAP.MEDICOALT].trim() : '';
+        if (medicosDialisis.includes(medicoFila)) {
+            mod.dialisis = 1; 
+        }
+
+                    let estadiaNum = -1;
+                    if(row.ing && row.alt) { 
+                        estadiaNum = (row.alt - row.ing)/36e5;
+                        if(estadiaNum >= 0) row.stay = estadiaNum.toFixed(1)+'h';
+                    }
+                    row.estadiaNum = estadiaNum;
+
+                    [COL_MAP.SERVING, COL_MAP.SERVALT].forEach(idx => { if(c[idx] && c[idx].trim() !== '') { c[idx] = ''; mod.cleaned_serv = 1; } });
+                    for(let k=53; k<=72; k++) { if(c[k] && c[k].trim() !== '') { c[k] = ''; mod.cleaned_tras = 1; } }
+            
+                    const mapaEspint = { "0003": "04", "0005": "53", "0008": "43", "0010": "40", "0012": "44", "0016": "54", "0037": "71", "0039": "40", "0041": "43", "0042": "43", "0064": "04" };
+                    
+                    if (c[COL_MAP.ESPINT] != null) { 
+                        let codEspint = String(c[COL_MAP.ESPINT]).trim();
+                        if (codEspint !== '') {
+                            if (mapaEspint.hasOwnProperty(codEspint)) {
+                                c[COL_MAP.ESPINT] = mapaEspint[codEspint];
+                                mod.cleaned_tras = 1;
+                            } else {
+                                c[COL_MAP.ESPINT] = '';
+                                mod.cleaned_tras = 1;
+                            }
+                        }
+                    }
+                    
+                    // Ajuste de Proc 10 a 5 si Tip Ing 2
+                    if (c[COL_MAP.TIPING] != null) {
+                        let tipIng = String(c[COL_MAP.TIPING]).trim();
+                        let pVal = c[idxProcSeguro] ? String(c[idxProcSeguro]).trim() : '';
+                        if ((tipIng === '2' || tipIng === '02') && pVal === '10') {
+                            c[idxProcSeguro] = '5';
+                            mod.cleaned_tras = 1; 
+                        }
+                    }
+
+                    // --- REGLA: SILLÓN ONCOLÓGICO QTX (Hereda lógica CMA) ---
+                    const rutOncologo = medicoFila ? medicoFila.toUpperCase().replace(/\s+/g, '') : '';
+                    const tipoIngreso = c[COL_MAP.TIPING] ? parseInt(String(c[COL_MAP.TIPING]).trim(), 10) : null;
+                    const procedencia = c[idxProcSeguro] ? parseInt(String(c[idxProcSeguro]).trim(), 10) : null;
+
+                    const esMedicoQtx = QTX_MEDICOS.includes(rutOncologo);
+                    const esIngresoQtx = (tipoIngreso === 2);
+                    const esProcedenciaQtx = (procedencia === 5);
+                    const esAmbulatorio = (estadiaNum >= 0 && estadiaNum < 24);
+
+                    if (esMedicoQtx && esIngresoQtx && esProcedenciaQtx && esAmbulatorio) {
+                        c[COL_MAP.PROGRAMA] = '6'; 
+                        
+                        if (!c[COL_MAP.NOTA].includes('Rev. Sillón Oncológico QTX')) {
+                            c[COL_MAP.NOTA] = `${c[COL_MAP.NOTA]} Rev. Sillón Oncológico QTX`.trim();
+                        }
+                        
+                        mod.cleaned_tras = 1; 
+                        mod.cma = 1; // Activa el escudo protector y lo envía a la vista CMA
+                        mod.qtx = 1; // Cuenta propia en el apartado QTX
+                    }
+                    // --------------------------------------------------------
+
+                    let tipAlt = c[COL_MAP.TIPALT] ? String(c[COL_MAP.TIPALT]).trim() : '';
+                    if (tipAlt === '4') {
+                        c[COL_MAP.TIPALT] = '3';
+                        mod.cleaned_tras = 1; 
+                    }
+
+                    if (estadiaNum >= 0 && estadiaNum < 24) {
+                        let currentTipAlt = c[COL_MAP.TIPALT] ? String(c[COL_MAP.TIPALT]).trim() : '';
+                        if (currentTipAlt === '3' || currentTipAlt === '4') {
+                            let esNeonato = RN_REGEX.test(c[COL_MAP.NOMBRE] || '') || row.age.val === 0.01;
+                            let notaActual = c[COL_MAP.NOTA] ? c[COL_MAP.NOTA].toUpperCase() : '';
+                            // ACA SE APLICA EL ESCUDO PROTECTOR PARA CMA, PAB QX y AHORA QTX
+                            let esPabOCma = notaActual.includes('PAB QX') || notaActual.includes('CMA') || notaActual.includes('QTX');
+                            if (!esNeonato && !esPabOCma) {
+                                c[COL_MAP.TIPALT] = '';
+                                mod.cleaned_tras = 1; 
+                            }
+                        }
+                    }
+                    
+                    // RUT
+                    if(F.empty_rut && (!c[COL_MAP.CIP] || !c[COL_MAP.CIP].trim())) {
+                        if(c[COL_MAP.CAT_OCP] !== '99') { c[COL_MAP.CAT_OCP] = '99'; }
+                        if(c[COL_MAP.OCUPACION] !== '99') { c[COL_MAP.OCUPACION] = '99'; }
+                        if(c[COL_MAP.REGCON] !== '8') { c[COL_MAP.REGCON] = '8'; }
+                        const noteMsg = 'RUT Vacío';
+                        if (!c[COL_MAP.NOTA].includes(noteMsg)) c[COL_MAP.NOTA] = (c[COL_MAP.NOTA] + ' ' + noteMsg).trim();
+                        mod.empty_rut = 1;
+                    }
+                    if (F.rut && !mod.empty_rut && c[COL_MAP.CIP]) {
+                        const r = c[COL_MAP.CIP].replace(/\./g,'').split('-')[0];
+                        if (r.length===8 && !isNaN(r)) {
+                            const pfx = parseInt(r.substring(0,2));
+                            if(pfx>=40 && pfx<=54) {
+                                if(c[COL_MAP.TIPO_CIP]!=='5') c[COL_MAP.TIPO_CIP]='5';
+                                if(c[COL_MAP.REGCON]!=='1') c[COL_MAP.REGCON]='1';
+                                if(c[COL_MAP.PAIS]!=='9999') c[COL_MAP.PAIS]='9999';
+                                if(c[COL_MAP.CAT_OCP]!=='02') c[COL_MAP.CAT_OCP]='02';
+                                mod.rut=1;
+                            }
+                        }
+                    }
+
+                    if (F.geo) {
+                        let com = c[COL_MAP.COMUNA].trim();
+                        let prov = c[COL_MAP.PROV].trim();
+                        let etnia = c[COL_MAP.ETNIA].trim();
+                        let changed = false;
+                        
+                        if (com === '') {
+                            if (com !== '99999' || prov !== '999') { 
+                                c[COL_MAP.COMUNA] = '99999'; c[COL_MAP.PROV] = '999'; 
+                                prov = '999'; changed = true; 
+                            }
+                        } else if (com.length >= 3 && prov !== com.substring(0,3)) {
+                            c[COL_MAP.PROV] = com.substring(0,3); prov = c[COL_MAP.PROV]; changed = true;
+                        }
+
+                        if (c[COL_MAP.COMUNA] === '99999' || c[COL_MAP.PROV] === '999') {
+                            c[COL_MAP.COMUNA] = '02201'; c[COL_MAP.PROV] = '022'; changed = true;
+                        }
+
+                        if (etnia !== '96') { c[COL_MAP.ETNIA] = '96'; changed = true; }
+                        if (changed) mod.geo = 1;
+                    }
+
+                    if (F.pam && row.age.val>=60 && ['1','5'].includes(c[COL_MAP.TIPO_CIP]) && ['1','2','3','4','7','11','12','13'].includes(c[COL_MAP.REGCON])) {
+                        if(c[COL_MAP.CAT_OCP]!=='00') c[COL_MAP.CAT_OCP]='00';
+                        if(c[COL_MAP.PROGRAMA]!=='06') c[COL_MAP.PROGRAMA]='06';
+                        mod.pam=1;
+                    }
+
+                    if (F.active && row.age.val >= 18 && row.age.val < 60) {
+                        if (c[COL_MAP.TIPO_CIP] === '1') {
+                            const validRegs = ['11', '12', '13', '2', '3', '4', '5', '6', '7'];
+                            const rc = c[COL_MAP.REGCON] ? c[COL_MAP.REGCON].trim() : '';
+                            if (validRegs.includes(rc)) {
+                                if (c[COL_MAP.CAT_OCP] !== '01') { c[COL_MAP.CAT_OCP] = '01'; mod.active = 1; }
+                            }
+                        }
+                    }
+
+                    if (row.age.val >= 0 && row.age.val < 18) {
+                        if (c[COL_MAP.CAT_OCP] !== '00') { c[COL_MAP.CAT_OCP] = '00'; mod.cleaned_tras = 1; }
+                    }
+
+                    if (F.prev) {
+                        if (c[COL_MAP.REGCON] === '0') { c[COL_MAP.REGCON] = '8'; c[COL_MAP.CAT_OCP] = '99'; mod.prev = 1; }
+                    }
+                    if (!mod.empty_rut && !mod.prev && c[COL_MAP.CAT_OCP] && c[COL_MAP.CAT_OCP].trim() === '99') { 
+                        c[COL_MAP.CAT_OCP] = ''; mod.cat_ocp = 1; 
+                    }
+
+                    if (!c[COL_MAP.CIP] || !c[COL_MAP.CIP].trim()) {
+                        c[COL_MAP.PAIS] = '';
+                    } else {
+                        const rutLimpio = c[COL_MAP.CIP].replace(/\./g, '').split('-')[0];
+                        if (!isNaN(rutLimpio) && rutLimpio.length >= 6) {
+                            const millonesRUT = parseInt(rutLimpio) / 1000000;
+                            if (millonesRUT >= 40 && millonesRUT < 55) {
+                                c[COL_MAP.PAIS] = ''; mod.cleaned_tras = 1;
+                            } 
+                            else if (millonesRUT < 40 && row.age.val >= 0) {
+                                const millonesEsperados = 27 - (0.3 * row.age.val);
+                                if (millonesRUT < (millonesEsperados - 5) || millonesRUT > (millonesEsperados + 5)) {
+                                    c[COL_MAP.PAIS] = ''; mod.cleaned_tras = 1;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (row.pabDate && row.ing && row.pabDate < row.ing) {
+                        c[COL_MAP.FECING] = c[COL_MAP.FEC_INT_1];
+                        row.ing = new Date(row.pabDate.getTime());
+                        mod.cleaned_tras = 1; 
+                    }
+
+                    if (F.out_pab && row.pabDate && row.alt && row.pabDate > row.alt) {
+                        mod.out_pab = 1;
+                        const msDiff = row.pabDate - row.alt;
+                        const hDiff = Math.floor(msDiff / 36e5); const mDiff = Math.floor((msDiff % 36e5) / 60000);
+                        row.diffHours = `${hDiff}h ${mDiff}m`;
+                        const noteMsg = 'Pab. fuera del EP.';
+                        if (!c[COL_MAP.NOTA].includes(noteMsg)) c[COL_MAP.NOTA] = (c[COL_MAP.NOTA] + ' ' + noteMsg).trim();
+                    }
+
+                    if (F.pab) {
+                        const pab = c[COL_MAP.TIP_PAB] ? c[COL_MAP.TIP_PAB].trim() : '';
+                        const isMpab = pab.toUpperCase().includes('MPAB');
+                        if(pab==='LPAB' || pab==='UPAB' || isMpab) {
+                            let note='', isCma=false;
+                            if (isMpab) { c[COL_MAP.TIP_PAB] = '2'; note = 'Pab Qx MPAB'; }
+                            else if(pab==='LPAB') { c[COL_MAP.TIP_PAB]='1'; note='Pab Qx'; }
+                            else { c[COL_MAP.TIP_PAB]='5'; note='Pab Qx Ux'; }
+                            
+                            let tipIngVal2 = c[COL_MAP.TIPING] ? parseInt(String(c[COL_MAP.TIPING]).trim(), 10) : null;
+                            if(tipIngVal2 === 2 && estadiaNum >= 0 && estadiaNum < 24) isCma=true;
+                            
+                            if(isCma) { note = isMpab ? 'Rev. CMA MPab' : 'Rev. CMA'; mod.cma=1; } else { mod.pab=1; }
+                            if (!c[COL_MAP.NOTA].includes(note)) c[COL_MAP.NOTA] = (c[COL_MAP.NOTA] + ' ' + note).trim();
+                        }
+                    }
+
+                    if (mod.out_pab) {
+                        let cur = c[COL_MAP.NOTA];
+                        cur = cur.replace('Pab Qx Ux', '').replace('Pab Qx', '').replace('Rev. CMA', '').trim();
+                        if (!cur.includes('Pab. fuera del EP.')) cur += ' Pab. fuera del EP.';
+                        c[COL_MAP.NOTA] = cur.trim();
+                    }
+                    
+                    if(F.hd) {
+                        const med = c[COL_MAP.MEDICOALT] ? c[COL_MAP.MEDICOALT].trim() : '';
+                        if(HD_MEDICOS.includes(med)) {
+                            c[COL_MAP.NOTA] = (c[COL_MAP.TIPALT] === '2') ? "FALLECIDO HD" : "HD";
+                            mod.hd=1;
+                        }
+                    }
+
+                    if (estadiaNum >= 0 && estadiaNum < 24) {
+                        let notaActual = c[COL_MAP.NOTA] || '';
+                        if (notaActual.includes('Pab Qx') && !notaActual.includes('<24h')) {
+                            c[COL_MAP.NOTA] = notaActual.trim() + ' <24h';
+                            mod.cma = 1; 
+                        }
+                    }
+                    
+                    if(F.dead && c[COL_MAP.TIPALT]==='2') {
+                        mod.dead = 1;
+                        const isHD = mod.hd || c[COL_MAP.NOTA].includes('HD'); 
+                        c[COL_MAP.NOTA] = isHD ? "FALLECIDO HD" : "FALLECIDO";
+                        deceasedList.push({
+                            id: c[COL_MAP.HISTORIA], ep: c[COL_MAP.EPISODIO], rut: c[COL_MAP.CIP] || '-', name: row.fullName,
+                            dob: c[COL_MAP.FECNAC], age: row.age, sex: c[COL_MAP.SEXO]==='01'?'Hombre':'Mujer',
+                            ing: c[COL_MAP.FECING], alt: c[COL_MAP.FECALT], altDateObj: row.alt, state: 'FALLECIDO'
+                        });
+                    }
+
+                    const esFallecido = c[COL_MAP.TIPALT] === '2' || c[COL_MAP.NOTA].includes('FALLECIDO');
+                    if (esFallecido && estadiaNum >= 0 && estadiaNum < 24) {
+                        let notaActual = c[COL_MAP.NOTA] || '';
+                        if (!notaActual.includes('HD') && !notaActual.includes('<24h')) {
+                            if (!notaActual.includes('FALLECIDO')) {
+                                c[COL_MAP.NOTA] = (notaActual.trim() + ' FALLECIDO <24h').trim();
+                            } else {
+                                c[COL_MAP.NOTA] = notaActual.trim() + ' <24h';
+                            }
+                        }
+                    }
+
+                    if (F.rn) {
+                        const nameCell = c[COL_MAP.NOMBRE];
+                        if (nameCell && RN_REGEX.test(nameCell.trim())) {
+                            mod.rn = 1; 
+                            const rawCip = c[COL_MAP.CIP];
+                            rnList.push({
+                                id: c[COL_MAP.HISTORIA], ep: c[COL_MAP.EPISODIO],
+                                rut: (!rawCip || rawCip.trim() === '') ? "VACIO" : "Revisar", name: row.fullName,
+                                dob: c[COL_MAP.FECNAC], age: row.age, sex: c[COL_MAP.SEXO]==='01'?'Hombre':'Mujer',
+                                ing: c[COL_MAP.FECING], alt: c[COL_MAP.FECALT], altDateObj: row.alt, state: "INVALIDO"
+                            });
+                        }
+                    }
+                
+                    if ((!c[COL_MAP.TIPALT] || String(c[COL_MAP.TIPALT]).trim() === '') && (!c[COL_MAP.NOTA] || String(c[COL_MAP.NOTA]).trim() === '') && row.ing && row.alt) {
+                        const msDiff = row.alt - row.ing;
+                        if (msDiff >= 0 && msDiff < 24 * 36e5) {
+                            c[COL_MAP.NOTA] = `[Rev. EP. ${Math.floor(msDiff / 36e5)}h y ${Math.floor((msDiff % 36e5) / 60000)}min]`;
+                            mod.cleaned_tras = 1; 
+                        }
+                    }
+                });
+
+                if (F.hd) {
+                    records.sort((a, b) => {
+                        const patA = a.c[COL_MAP.HISTORIA] || a.c[COL_MAP.CIP];
+                        const patB = b.c[COL_MAP.HISTORIA] || b.c[COL_MAP.CIP];
+                        if (patA < patB) return -1; if (patA > patB) return 1;
+                        if (a.ing && b.ing) return a.ing - b.ing; return 0;
+                    });
+                    for (let i = 1; i < records.length; i++) {
+                        const curr = records[i], prev = records[i-1];
+                        if (curr.mod.hd || curr.c[COL_MAP.NOTA] === 'HD' || curr.c[COL_MAP.NOTA] === 'FALLECIDO HD') {
+                            const patA = curr.c[COL_MAP.HISTORIA] || curr.c[COL_MAP.CIP];
+                            const patB = prev.c[COL_MAP.HISTORIA] || prev.c[COL_MAP.CIP];
+                            if (patA === patB && prev.alt && curr.ing) {
+                                const gap = (curr.ing - prev.alt) / 36e5; 
+                                if (gap > -24 && gap < 48) { 
+                                    prev.c[COL_MAP.TIPALT] = '10'; prev.continuo = 'SI'; curr.continuo = 'SI';
+                                    prev.mod.hd = 1; curr.mod.hd = 1; 
+                                }
+                            }
+                        }
+                    }
+                    records.sort((a,b) => a.idx - b.idx);
+                }
+
+                // --- QTX y DIÁLISIS: valores fijos (al final, para que ninguna regla los sobrescriba) ---
+                records.forEach(r => {
+                    if (r.mod.qtx) {
+                        QTX_VALORES.forEach(([idx, val]) => { r.c[idx] = val; });
+                    }
+                    if (r.mod.dialisis) {
+                        DIALISIS_NEFROTRON.forEach(([idx, val]) => { r.c[idx] = val; });
+                    }
+                });
+
+                if (F.rn) {
+                    const mothers = records.filter(m => m.c[COL_MAP.SEXO] === '02' && m.age.val >= 12);
+                    records.forEach(r => {
+                        if (r.mod.rn) { 
+                            let rnNom = (r.c[COL_MAP.NOMBRE] || '').toUpperCase().replace(/^(HIJO\s+DE|HIJA\s+DE|RN\s+DE|RN\s+)/, '').trim();
+                            let rnAp1 = (r.c[42] || '').toUpperCase().trim(), rnAp2 = (r.c[43] || '').toUpperCase().trim(); 
+                            let bestMatch = null, highestScore = 0;
+
+                            for (let m of mothers) {
+                                let score = 0;
+                                let mNom = (m.c[COL_MAP.NOMBRE] || '').toUpperCase().trim();
+                                let mAp1 = (m.c[42] || '').toUpperCase().trim(), mAp2 = (m.c[43] || '').toUpperCase().trim();
+                                
+                                if (rnAp1 !== '' && mAp1 !== '' && rnAp1 === mAp1) score += 3;
+                                if (rnAp2 !== '' && mAp2 !== '' && rnAp2 === mAp2) score += 2;
+                                if (rnNom !== '' && mNom !== '' && (rnNom.includes(mNom) || mNom.includes(rnNom))) score += 2;
+                                
+                                if (r.dob && m.ing) {
+                                    let diffDays = Math.abs(r.dob - m.ing) / (1000 * 60 * 60 * 24);
+                                    if (diffDays <= 5) score += 2; 
+                                    if (diffDays > 30) continue;   
+                                }
+                                if (score > highestScore && score >= 5) { highestScore = score; bestMatch = m; }
+                            }
+                            
+                            r.c[COL_MAP.NOTA] = r.c[COL_MAP.NOTA].replace('RUT Vacío', '').trim();
+                            let rnNote = "";
+                            if (bestMatch) {
+                                let mCip = (bestMatch.c[COL_MAP.CIP] || '').trim(), mHist = (bestMatch.c[COL_MAP.HISTORIA] || '').trim();
+                                rnNote = mCip !== '' ? `RN de ${mHist} ó ${mCip}` : `RN de ${mHist} s/RUT`;
+                            } else {
+                                rnNote = "RN Datos incompletos";
+                            }
+                            r.c[COL_MAP.NOTA] = (r.c[COL_MAP.NOTA] + ' ' + rnNote).trim();
+                        }
+                    });
+                }
+                partoApplied = !!(F.parto && partoBook);
+                if (F.parto) crossPartoBook(records, header);
+                pabApplied = !!(F.pablib && pabBook);
+                if (F.pablib) crossPabBook(records, header);
+                allParsedRecords = records;
+
+                let out = [header.join('|')];
+                records.forEach(r => {
+                    if (!(F.dialisis === false && r.mod.dialisis === 1)) {
+                        out.push(r.c.join('|'));
+                    }
+
+                    const rowObj = { c: r.c, mod: r.mod, ageText: r.age.text, stay: r.stay, estadiaNum: r.estadiaNum, diffHours: r.diffHours, continuo: r.continuo, fullName: r.fullName, partoInfo: r.partoInfo || '', pabInfo: r.pabInfo || '' };
+                    
+                    if(r.mod.cleaned_serv || r.mod.cleaned_tras) modData.cleaned.push(rowObj);
+                    if(r.mod.rut) modData.rut.push(rowObj);
+                    if(r.mod.empty_rut) modData.empty_rut.push(rowObj);
+                    if(r.mod.geo) modData.geo.push(rowObj);
+                    if(r.mod.pam) modData.pam.push(rowObj);
+                    if(r.mod.active) modData.active.push(rowObj);
+                    if(r.mod.prev) modData.prev.push(rowObj);
+                    if(r.mod.pab) modData.pab.push(rowObj);
+                    if(r.mod.cma) modData.cma.push(rowObj);
+                    if(r.mod.qtx) modData.qtx.push(rowObj);
+                    if(r.mod.hd || (F.hd && (r.c[COL_MAP.NOTA] === 'HD' || r.c[COL_MAP.NOTA] === 'FALLECIDO HD'))) modData.hd.push(rowObj);
+                    if(r.mod.dialisis) modData.dialisis.push(rowObj);
+                    if(r.mod.dead) modData.dead.push(rowObj);
+                    if(r.mod.rn) modData.rn.push(rowObj);
+                    if(r.mod.parto) modData.parto.push(rowObj);
+                    if(r.mod.pablib) modData.pablib.push(rowObj);
+                    if(r.mod.out_pab) modData.out_pab.push(rowObj);
+                });
+
+                processedData = out.join('\n');
+                renderStats();
+                renderTable('cleaned'); 
+                
+                els.outputArea.classList.remove('hidden');
+                els.outputArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (err) {
+                console.error(err);
+                alert("Error: " + err.message);
+            }
+        }
+
+        function renderStats() {
+            const createBtn = (key, label, color, always = false) => {
+                const count = modData[key].length;
+                if(count === 0 && !always) return '';
+                const isActive = activeFilter === key;
+                return `<button onclick="renderTable('${key}')" class="px-3 py-1 bg-${color}-100 dark:bg-${color}-900/30 text-${color}-800 dark:text-${color}-300 rounded-lg border border-${color}-200 dark:border-${color}-800 font-mono text-xs hover:opacity-80 transition-all ${isActive ? 'pill-active' : ''}">${label}: ${count}</button>`;
+            };
+
+            let sHtml = '';
+            sHtml += createBtn('cleaned', 'Limpieza', 'gray'); 
+            sHtml += createBtn('rut', 'RUT', 'blue');
+            sHtml += createBtn('empty_rut', 'RUT Vacío', 'red');
+            sHtml += createBtn('geo', 'Geo / Etnia', 'purple');
+            sHtml += createBtn('pam', 'PAM', 'pink');
+            sHtml += createBtn('active', 'Activos', 'teal');
+            sHtml += createBtn('prev', 'Previsión', 'cyan');
+            sHtml += createBtn('pab', 'Pab', 'orange');
+            sHtml += createBtn('out_pab', 'Pab. Post-EP.', 'amber');
+            sHtml += createBtn('cma', 'CMA', 'teal');
+            sHtml += createBtn('hd', 'HD', 'indigo');
+            sHtml += createBtn('qtx', 'QTX', 'violet', true);
+            sHtml += createBtn('dialisis', 'Diálisis', 'rose', true); 
+            
+            sHtml += createBtn('parto', 'Libro Parto', 'fuchsia');
+            sHtml += createBtn('pablib', 'Libro Pabellón', 'orange');
+            if(modData.dead.length) sHtml += `<button onclick="renderTable('dead')" class="px-3 py-1 bg-black text-white dark:bg-white dark:text-black rounded-lg shadow-sm font-bold hover:opacity-80 transition-all ${activeFilter === 'dead' ? 'pill-active' : ''}">Fallecidos: ${modData.dead.length}</button>`;
+            if(modData.rn.length) sHtml += `<button onclick="renderTable('rn')" class="px-3 py-1 bg-blue-600 text-white rounded-lg shadow-sm font-bold hover:opacity-80 transition-all ${activeFilter === 'rn' ? 'pill-active' : ''}">RN sin RUT: ${modData.rn.length}</button>`;
+
+            if (partoBook) {
+                const det = partoReport.sin.map(x => `<li>${x.b.ficha} · ${x.b.rut} · ${x.b.nombre} · ${x.b.dt ? fmtDT(x.b.dt) : 's/fecha'} — ${x.why}</li>`).join('');
+                sHtml += `<div class="w-full text-xs text-slate-500 dark:text-slate-400"><b class="text-fuchsia-600 dark:text-fuchsia-400">Libro Parto:</b> ${partoReport.ok} RN cargados en ${modData.parto.length} episodios · ${partoReport.sin.length} partos del libro sin episodio en este TXT` +
+                    (det ? `<details class="mt-1"><summary class="cursor-pointer font-bold">Ver partos sin cruzar</summary><ul class="list-disc ml-5 mt-1">${det}</ul></details>` : '') + `</div>`;
+            }
+            if (pabBook) {
+                const det = pabReport.sin.map(x => `<li>${x.p.ficha} · ${x.p.rutTxt} · ${x.p.nombre} · ${x.p.day.split('-').reverse().join('/')} ${x.p.hora} · MAI ${x.p.cod} — ${x.why}</li>`).join('');
+                sHtml += `<div class="w-full text-xs text-slate-500 dark:text-slate-400"><b class="text-orange-600 dark:text-orange-400">Libro Pabellón:</b> ${pabReport.ok} ambulatorios + ${pabReport.ok2 || 0} Rev. CMA + ${pabReport.ok3 || 0} Pab &lt;24h cargados (RUT + Ficha + fecha + hora) · ${pabReport.sin.length} sin cruzar · ${(pabReport.cmaSin || []).length} Rev. CMA / Pab &lt;24h aún sin cruce` +
+                    (det ? `<details class="mt-1"><summary class="cursor-pointer font-bold">Ver filas del libro sin cruzar</summary><ul class="list-disc ml-5 mt-1">${det}</ul></details>` : '') +
+                    ((pabReport.cmaSin || []).length ? `<details class="mt-1"><summary class="cursor-pointer font-bold">Ver Rev. CMA / Pab &lt;24h aún sin cruce</summary><ul class="list-disc ml-5 mt-1">${pabReport.cmaSin.map(x => `<li>${x.r.c[COL_MAP.HISTORIA]} · ${x.r.c[COL_MAP.CIP] || 'S/RUT'} · ${x.r.fullName} · ${x.r.c[COL_MAP.NOTA]} · pab ${x.r.c[COL_MAP.FEC_INT_1]} — ${x.why}</li>`).join('')}</ul></details>` : '') + `</div>`;
+            }
+            els.statsBar.innerHTML = sHtml || '<span class="text-slate-400">Sin cambios detectados.</span>';
+            els.btnPdfDead.classList.toggle('hidden', deceasedList.length === 0);
+            els.btnPdfRn.classList.toggle('hidden', rnList.length === 0);
+            els.btnPdfStay.classList.toggle('hidden', allParsedRecords.length === 0); 
+            els.btnPdfDialisis.classList.toggle('hidden', modData.dialisis.length === 0); 
+        }
+
+        window.renderTable = function(filterKey) {
+            activeFilter = filterKey;
+            renderStats();
+            
+            let data = modData[filterKey];
+            els.tableBody.innerHTML = '';
+            
+            if (filterKey === 'out_pab') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-amber-600 dark:text-amber-400 font-bold">Pabellon Dudoso</span>';
+            } else if (filterKey === 'hd') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-indigo-600 dark:text-indigo-400 font-bold">HD</span>';
+                data = [...data].sort((a, b) => {
+                    const contA = (a.continuo === 'SI') ? 0 : 1; const contB = (b.continuo === 'SI') ? 0 : 1;
+                    if (contA !== contB) return contA - contB; 
+                    const patA = a.c[COL_MAP.HISTORIA] || a.c[COL_MAP.CIP]; const patB = b.c[COL_MAP.HISTORIA] || b.c[COL_MAP.CIP];
+                    if (patA < patB) return -1; if (patA > patB) return 1;
+                    const da = parseDate(a.c[COL_MAP.FECING]); const db = parseDate(b.c[COL_MAP.FECING]);
+                    return da - db;
+                });
+            } else if (filterKey === 'active') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-teal-600 dark:text-teal-400 font-bold">Fuerza Laboral</span>';
+            } else if (filterKey === 'prev') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-cyan-600 dark:text-cyan-400 font-bold">Corrección Previsional</span>';
+            } else if (filterKey === 'pablib') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-orange-600 dark:text-orange-400 font-bold">Libro de Pabellón Ambulatorio → SIDEBAR 1-3</span>';
+            } else if (filterKey === 'parto') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-fuchsia-600 dark:text-fuchsia-400 font-bold">Libro de Partos → TXT (FECPART, TGESTAC, RN)</span>';
+            } else if (filterKey === 'qtx') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-violet-600 dark:text-violet-400 font-bold">Sillón Oncológico QTX</span>';
+            } else if (filterKey === 'dialisis') {
+                els.previewTitle.innerHTML = 'Vista Previa: <span class="text-rose-600 dark:text-rose-400 font-bold">Diálisis</span>';
+                data = [...data].sort((a, b) => b.estadiaNum - a.estadiaNum); 
+            } else {
+                els.previewTitle.innerHTML = `Vista Previa: <span class="text-blue-600 dark:text-blue-400 capitalize">${filterKey.replace('_', ' ')}</span>`;
+            }
+
+            const isOutPab = filterKey === 'out_pab';
+            const isHD = filterKey === 'hd';
+            const isActive = filterKey === 'active';
+            const isPrev = filterKey === 'prev';
+
+            const hideInHD = isHD || isOutPab;
+            els.headers.tcip.style.display = (hideInHD || isActive) ? 'none' : '';
+            els.headers.mres.style.display = hideInHD ? 'none' : '';
+            els.headers.prov.style.display = hideInHD ? 'none' : '';
+            els.headers.tpab.style.display = (isHD || isActive || isPrev) ? 'none' : '';
+            els.headers.fechax.style.display = (isHD || isActive || isPrev) ? 'none' : '';
+            els.headers.tipalt.style.display = isHD ? '' : 'none'; 
+            els.headers.medico.style.display = isHD ? '' : 'none'; 
+            els.headers.regcon.style.display = (isActive || isPrev) ? '' : 'none';
+            els.headers.catocp.style.display = (isActive || isPrev) ? '' : 'none';
+
+            if (isOutPab) {
+                els.headers.edad.textContent = 'FECING'; els.headers.prog.textContent = 'FECALT'; els.headers.estadia.textContent = 'Horas Post';
+            } else if (isHD) {
+                els.headers.edad.textContent = 'FECING'; els.headers.prog.textContent = 'FECALT'; els.headers.estadia.textContent = 'CONTINUO';
+            } else {
+                els.headers.edad.textContent = 'Edad'; els.headers.prog.textContent = 'Prog'; els.headers.estadia.textContent = 'Estadía';
+            }
+
+            const filterColors = {
+                rut: 'blue', empty_rut: 'red', geo: 'purple', pam: 'pink', pab: 'orange', out_pab: 'amber',
+                cma: 'teal', hd: 'indigo', dead: 'slate', rn: 'blue', active: 'teal', prev: 'cyan',
+                dialisis: 'rose', qtx: 'violet', cleaned: 'gray', parto: 'fuchsia', pablib: 'orange'
+            };
+            const themeColor = filterColors[filterKey] || 'slate';
+
+            const highlights = {
+                rut: ['cip', 'tcip'], empty_rut: ['cip', 'tcip', 'nota'], geo: ['prov', 'comuna', 'mres'],
+                pam: ['edad', 'prog'], pab: ['tpab', 'nota'], cma: ['tpab', 'nota', 'prog'],
+                out_pab: ['fechax', 'prog', 'estadia', 'tpab'], dead: ['nota'], 
+                hd: ['nota', 'estadia', 'tipalt', 'medico'], active: ['edad', 'tcip', 'regcon', 'catocp'],
+                prev: ['regcon', 'catocp'], dialisis: ['estadia', 'nota', 'prog'], qtx: ['estadia', 'nota', 'prog'], rn: ['cip', 'nombre'], parto: ['nota'], pablib: ['nota', 'fechax'], cleaned: []
+            };
+            const currentHighlights = highlights[filterKey] || [];
+            
+            const isHl = (colId) => {
+                if(!currentHighlights.includes(colId)) return 'text-slate-500 dark:text-slate-400';
+                if(filterKey === 'dead') return `font-bold text-slate-900 dark:text-white bg-slate-200 dark:bg-slate-700`;
+                return `font-bold text-${themeColor}-600 dark:text-${themeColor}-400 bg-${themeColor}-50 dark:bg-${themeColor}-900/20`;
+            };
+
+            if(data.length === 0) {
+                els.msgNoChanges.classList.remove('hidden');
+            } else {
+                els.msgNoChanges.classList.add('hidden');
+                const displayData = (isHD) ? data : (data.length > 150 ? data.slice(0, 150) : data);
+                
+                displayData.forEach(item => {
+                    const {c, mod} = item;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors";
+                    const tdBase = "px-6 py-3 border-r border-slate-100 dark:border-slate-800 last:border-0 truncate max-w-[150px]";
+                    
+                    let noteContent = (filterKey === 'parto') ? (item.partoInfo || '') : (filterKey === 'pablib') ? (item.pabInfo || '') : (c[COL_MAP.NOTA] || '');
+                    let noteClasses = isHl('nota'); 
+                    
+                    const nUpper = noteContent.toUpperCase();
+                    if (mod.dead || nUpper.includes('FALLECIDO')) noteClasses = 'bg-gray-200 text-black border-l-8 border-black font-extrabold dark:bg-slate-700 dark:text-white dark:border-white';
+                    else if (mod.empty_rut) noteClasses = 'bg-red-100 text-red-900 border-l-8 border-red-600 font-bold dark:bg-red-900/60 dark:text-red-100 dark:border-red-400';
+                    else if (mod.out_pab) noteClasses = 'bg-amber-100 text-amber-900 border-l-8 border-amber-600 font-bold dark:bg-amber-900/60 dark:text-amber-100 dark:border-amber-400';
+                    else if (mod.hd) noteClasses = 'bg-indigo-100 text-indigo-900 border-l-8 border-indigo-600 font-bold dark:bg-indigo-900/60 dark:text-indigo-100 dark:border-indigo-400';
+                    else if (mod.dialisis) noteClasses = 'bg-rose-100 text-rose-900 border-l-8 border-rose-600 font-bold dark:bg-rose-900/60 dark:text-rose-100 dark:border-rose-400';
+                    else if (noteContent.trim() !== '') noteClasses = 'bg-slate-100 text-slate-700 border-l-8 border-slate-400 font-medium dark:bg-slate-800 dark:text-slate-300 dark:border-slate-500';
+
+                    let colEdad, colProg, colEstadia;
+                    if (isOutPab) {
+                        colEdad = c[COL_MAP.FECING]; colProg = c[COL_MAP.FECALT]; colEstadia = item.diffHours;
+                    } else if (isHD) {
+                        colEdad = c[COL_MAP.FECING]; colProg = c[COL_MAP.FECALT]; colEstadia = item.continuo; 
+                    } else {
+                        colEdad = item.ageText; colProg = c[COL_MAP.PROGRAMA]; colEstadia = item.stay;
+                    }
+                    
+                    let tPabDisplay = c[COL_MAP.TIP_PAB];
+                    if (isOutPab) {
+                        if (tPabDisplay === '1') tPabDisplay = 'Pab CuO'; else if (tPabDisplay === '5') tPabDisplay = 'Pab Ux';
+                    }
+                    let tipAltDisplay = c[COL_MAP.TIPALT];
+                    if (isHD && tipAltDisplay === '10') tipAltDisplay = 'Hosp. Dom.';
+                    
+                    let medicoDisplay = '';
+                    if (isHD && HD_MEDICOS.includes(c[COL_MAP.MEDICOALT] ? c[COL_MAP.MEDICOALT].trim() : '')) medicoDisplay = 'Medico HD';
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-3 font-mono text-xs text-slate-400 sticky left-0 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">${c[COL_MAP.HISTORIA]}</td>
+                        <td class="${tdBase}">${c[COL_MAP.EPISODIO]}</td>
+                        <td class="${tdBase} ${isHl('cip')}">${c[COL_MAP.CIP]}</td>
+                        ${(!hideInHD && !isActive) ? `<td class="${tdBase} ${isHl('tcip')}">${c[COL_MAP.TIPO_CIP]}</td>` : ''}
+                        ${!hideInHD ? `<td class="${tdBase} ${isHl('mres')}">${c[COL_MAP.ETNIA]}</td>` : ''}
+                        ${!hideInHD ? `<td class="${tdBase} ${isHl('prov')}">${c[COL_MAP.PROV]}</td>` : ''}
+                        ${(isActive || isPrev) ? `<td class="${tdBase} ${isHl('regcon')}">${c[COL_MAP.REGCON]}</td>` : ''}
+                        ${(isActive || isPrev) ? `<td class="${tdBase} ${isHl('catocp')}">${c[COL_MAP.CAT_OCP]}</td>` : ''}
+                        <td class="${tdBase} ${isHl('edad')}">${colEdad}</td>
+                        <td class="${tdBase} ${isHl('prog')}">${colProg}</td>
+                        ${(!isHD && !isActive && !isPrev) ? `<td class="${tdBase} ${isHl('tpab')}">${tPabDisplay}</td>` : ''}
+                        ${(!isHD && !isActive && !isPrev) ? `<td class="${tdBase} ${isHl('fechax')}">${c[COL_MAP.FEC_INT_1]}</td>` : ''}
+                        ${isHD ? `<td class="${tdBase} ${isHl('tipalt')} font-bold text-indigo-600">${tipAltDisplay}</td>` : ''}
+                        ${isHD ? `<td class="${tdBase} ${isHl('medico')} font-mono text-[10px] text-slate-400">${medicoDisplay}</td>` : ''}
+                        <td class="px-6 py-3 border-r border-slate-100 dark:border-slate-800 last:border-0 ${noteClasses}">${noteContent}</td>
+                        <td class="${tdBase} text-right font-mono ${isHl('estadia')}">${colEstadia}</td>
+                    `;
+                    els.tableBody.appendChild(tr);
+                });
+            }
+        }
+
+        // --- 7. PDF GENERATION ---
+        function drawPill(doc, x, y, text) {
+            doc.setFontSize(8); doc.setFont("helvetica", "normal");
+            const w = doc.getTextWidth(text) + 10;
+            doc.setDrawColor(200); doc.setFillColor(250, 250, 252);
+            doc.roundedRect(x, y, w, 7, 2, 2, 'FD');
+            doc.setTextColor(100); doc.text(text, x + 5, y + 4.5);
+            return x + w + 5;
+        }
+
+        function generatePdfDialisis() {
+            if (!modData.dialisis || modData.dialisis.length === 0) return;
+
+            const grouped = {};
+            modData.dialisis.forEach(r => {
+                const rut = r.c[COL_MAP.CIP] || "SIN RUT";
+                const ficha = r.c[COL_MAP.HISTORIA];
+                const nombre = r.fullName || "SIN NOMBRE"; 
+                const hrs = r.estadiaNum > 0 ? r.estadiaNum : 0;
+                const key = rut + '_' + ficha;
+                if (!grouped[key]) { grouped[key] = { ficha, rut, nombre, count: 0, totalHrs: 0 }; }
+                grouped[key].count += 1; grouped[key].totalHrs += hrs;
+            });
+
+            const reportData = Object.values(grouped).map(g => {
+                const avg = g.totalHrs / g.count;
+                const h = Math.floor(avg);
+                const m = Math.round((avg - h) * 60);
+                return { 
+                    ficha: g.ficha, rut: g.rut, nombre: g.nombre, 
+                    cantidad: g.count, promedioRaw: avg, promedioFmt: `${h} hrs. ${m} min.` 
+                };
+            });
+
+            reportData.sort((a, b) => b.promedioRaw - a.promedioRaw);
+
+            const dates = modData.dialisis.map(r => parseDate(r.c[COL_MAP.FECALT])).filter(d => d);
+            let periodStr = "";
+            if (dates.length > 0) {
+                dates.sort((a,b) => a-b);
+                const minDate = dates[0];
+                const maxDate = dates[dates.length - 1];
+                const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+                const minStr = `${months[minDate.getMonth()]} ${minDate.getFullYear()}`;
+                const maxStr = `${months[maxDate.getMonth()]} ${maxDate.getFullYear()}`;
+                periodStr = minStr === maxStr ? minStr : `${minStr} - ${maxStr}`;
+            }
+
+            const doctoresMap = {
+                "07601174-5": "CASTRO MONTESINO RAUL LEONARDO (MEDICINA INTERNA)",
+                "16867943-2": "GALLARDO PEREIRA NIDIA KIN (MÉDICO CIRUJANO)",
+                "26871603-3": "ROSALES ARAQUE RITA (MEDICO CIRUJANO)",
+                "08412417-6": "RAMIREZ LEYTON GILMAR MARCELO (MEDICO CIRUJANO)",
+                "29064072-5": "LOPEZ AGUIRRE KAREN ALEJANDRA (MÉDICO CIRUJANO)"
+            };
+            let doctorCounts = {
+                "07601174-5": 0, "16867943-2": 0, "26871603-3": 0, "08412417-6": 0, "29064072-5": 0
+            };
+            modData.dialisis.forEach(r => {
+                let med = r.c[COL_MAP.MEDICOALT] ? r.c[COL_MAP.MEDICOALT].trim() : '';
+                if(doctorCounts[med] !== undefined) doctorCounts[med]++;
+            });
+
+            let rankingDoctores = Object.keys(doctorCounts).map(rut => ({
+                rut: rut,
+                nombre: doctoresMap[rut],
+                cantidad: doctorCounts[rut]
+            })).sort((a, b) => b.cantidad - a.cantidad);
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const dateStr = new Date().toLocaleString('es-CL');
+
+            const pageContent = function(data) {
+                doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(159, 18, 57);
+                doc.text(`Reporte Consolidado de Diálisis ${periodStr}`, 14, 15);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(1, 122, 255);
+                doc.text("Grupos Relacionados por Diagnóstico [ GARCHATRON 5500 Twin-Turbo ROTARY PPV ]", 14, 19);
+                
+                let nx = 14; nx = drawPill(doc, nx, 24, `Generado ${dateStr}`);
+                nx = drawPill(doc, nx, 24, `Total Pacientes: ${reportData.length}`);
+                drawPill(doc, nx, 24, `Hoja ${data.pageNumber} / {total_pages_count_string}`);
+                
+                const pageSize = doc.internal.pageSize;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(220, 38, 38);
+                const disclaimer = "Documento de uso interno exclusivo de la Unidad de Análisis Clínico GRD. Contiene datos de pacientes protegidos por la Ley N° 19.628 sobre Protección de la Vida Privada y la Ley N° 20.584. Queda estrictamente prohibida su reproducción, distribución o divulgación no autorizada.";
+                const splitDisclaimer = doc.splitTextToSize(disclaimer, pageSize.width - 28);
+                doc.text(splitDisclaimer, pageSize.width / 2, pageSize.height - 15, { align: 'center' });
+                doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(150);
+                doc.text(`[ ${APP_NAME} ${APP_VERSION} ]`, pageSize.width / 2, pageSize.height - 6, { align: 'center' });
+            };
+
+            doc.autoTable({
+                head: [['Ficha', 'RUT', 'Nombre Paciente', 'N° Egresos', 'Promedio por sesion']],
+                body: reportData.map(r => [r.ficha, r.rut, r.nombre, r.cantidad, r.promedioFmt]),
+                startY: 35, margin: { top: 35, bottom: 25, left: 14, right: 14 }, theme: 'plain',
+                styles: { font: 'helvetica', fontSize: 7, cellPadding: 1.5, textColor: 40, lineColor: 200, lineWidth: 0.1, valign: 'middle' },
+                headStyles: { fillColor: [225, 29, 72], textColor: 255, fontStyle: 'bold', lineWidth: 0 }, 
+                columnStyles: { 3: { halign: 'center', fontStyle: 'bold' }, 4: { halign: 'right', fontStyle: 'bold' } },
+                didDrawPage: pageContent
+            });
+
+            let finalY = doc.lastAutoTable.finalY || 35;
+            if (finalY + 30 > doc.internal.pageSize.height - 25) { 
+                doc.addPage();
+                finalY = 35;
+            } else {
+                finalY += 5; 
+            }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(1, 122, 255);
+            doc.text("Ranking de Médicos por Egresos (Sesiones)", 14, finalY + 5);
+
+            doc.autoTable({
+                head: [['RUT Médico', 'Nombre Médico', 'Total Egresos (Sesiones)']],
+                body: rankingDoctores.map(d => [d.rut, d.nombre, d.cantidad]),
+                startY: finalY + 8, margin: { top: 35, bottom: 25, left: 14, right: 14 }, theme: 'plain',
+                styles: { font: 'helvetica', fontSize: 7, cellPadding: 1.5, textColor: 40, lineColor: 200, lineWidth: 0.1, valign: 'middle' },
+                headStyles: { fillColor: [1, 122, 255], textColor: 255, fontStyle: 'bold', lineWidth: 0 }, 
+                columnStyles: { 2: { halign: 'center', fontStyle: 'bold' } },
+                didDrawPage: pageContent
+            });
+
+            if (typeof doc.putTotalPages === 'function') doc.putTotalPages("{total_pages_count_string}");
+            doc.save(`Reporte_Dialisis_${periodStr.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        function generatePdfDead() {
+            if (deceasedList.length === 0) return;
+            deceasedList.sort((a, b) => {
+                const dateA = a.altDateObj || new Date(0); const dateB = b.altDateObj || new Date(0); return dateA - dateB;
+            });
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const dateStr = new Date().toLocaleString('es-CL');
+            const dates = deceasedList.map(d => d.altDateObj).filter(d => d);
+            let rangeStr = "Sin rango";
+            if(dates.length) {
+                const min = new Date(Math.min(...dates)).toLocaleDateString('es-CL');
+                const max = new Date(Math.max(...dates)).toLocaleDateString('es-CL');
+                rangeStr = `${min} al ${max}`;
+            }
+
+            doc.autoTable({
+                head: [['Ficha', 'Episodio', 'RUT', 'Nombre Completo', 'Fecha de Nacimiento', 'Edad', 'Sexo', 'Fecha de Ingreso', 'Fecha de Alta', 'Estado']], 
+                body: deceasedList.map(r => [r.id, r.ep, r.rut, r.name, r.dob, r.age.text, r.sex, r.ing, r.alt, 'FALLECIDO']), 
+                startY: 35, margin: { top: 35, bottom: 25, left: 14, right: 14 }, theme: 'plain',
+                styles: { font: 'helvetica', fontSize: 7, cellPadding: 3, textColor: 40, lineColor: 220, lineWidth: 0.1, valign: 'middle' },
+                headStyles: { fillColor: [20, 20, 20], textColor: 255, fontStyle: 'bold', lineWidth: 0 },
+                columnStyles: { 3: {width:60}, 8: {fontStyle:'bold'} },
+                didDrawCell: function(data) {
+                    if (data.section === 'body') {
+                        if (data.column.index === 9) {
+                             const { x, y, width, height } = data.cell;
+                             doc.setFillColor(20, 20, 20); doc.roundedRect(x+2, y+(height/2)-3, width-4, 6, 2, 2, 'F');
+                             doc.setTextColor(240, 240, 240); doc.setFontSize(6); doc.setFont("helvetica","bold");
+                             doc.text("FALLECIDO", x+width/2, y+height/2+1, {align:'center'}); return false;
+                        }
+                        if (data.column.index === 5) {
+                             const rowItem = deceasedList[data.row.index];
+                             if (rowItem && rowItem.age.isChild) {
+                                 const { x, y, width, height } = data.cell;
+                                 doc.setFillColor(20, 20, 20); doc.roundedRect(x+2, y+(height/2)-3, width-4, 6, 2, 2, 'F');
+                                 doc.setTextColor(255, 255, 255); doc.setFontSize(7); doc.setFont("helvetica","bold");
+                                 doc.text(rowItem.age.text, x+width/2, y+height/2+1, {align:'center'}); return false;
+                             }
+                        }
+                    }
+                },
+                didDrawPage: function(data) {
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(20); doc.text("Reporte de Fallecidos GRD", 14, 15);
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(80); doc.text("Grupos Relacionados por Diagnóstico", 14, 19);
+                    let nx = 14; nx = drawPill(doc, nx, 24, `Generado ${dateStr}`); nx = drawPill(doc, nx, 24, `Revisado ${rangeStr}`); 
+                    nx = drawPill(doc, nx, 24, `${deceasedList.length} Registros`); drawPill(doc, nx, 24, `Hoja ${data.pageNumber} / {total_pages_count_string}`);
+                    
+                    const pageSize = doc.internal.pageSize;
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(220, 38, 38);
+                    const disclaimer = "Documento de uso interno exclusivo de la Unidad de Análisis Clínico GRD. Contiene datos de pacientes protegidos por la Ley N° 19.628 sobre Protección de la Vida Privada y la Ley N° 20.584. Queda estrictamente prohibida su reproducción, distribución o divulgación no autorizada.";
+                    const splitDisclaimer = doc.splitTextToSize(disclaimer, pageSize.width - 28);
+                    doc.text(splitDisclaimer, pageSize.width / 2, pageSize.height - 15, { align: 'center' });
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(150);
+                    doc.text(`[ ${APP_NAME} ${APP_VERSION} ]`, pageSize.width / 2, pageSize.height - 6, { align: 'center' });
+                }
+            });
+            if (typeof doc.putTotalPages === 'function') doc.putTotalPages("{total_pages_count_string}");
+            doc.save('Reporte_Fallecidos_GRD.pdf');
+        }
+
+        function generatePdfRN() {
+            if (rnList.length === 0) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const dateStr = new Date().toLocaleString('es-CL');
+            
+            doc.autoTable({
+                head: [['Ficha', 'Episodio', 'RUT', 'Nombre Completo', 'Fecha de Nacimiento', 'Edad', 'Sexo', 'Fecha de Ingreso', 'Fecha de Alta', 'Estado']], 
+                body: rnList.map(r => [r.id, r.ep, r.rut, r.name, r.dob, r.age.text, r.sex, r.ing, r.alt, r.state]), 
+                startY: 35, margin: { top: 35, bottom: 25, left: 14, right: 14 }, theme: 'plain',
+                styles: { font: 'helvetica', fontSize: 7, cellPadding: 3, textColor: 40, lineColor: 200, lineWidth: 0.1, valign: 'middle' },
+                headStyles: { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', lineWidth: 0 },
+                columnStyles: { 3: {width:60} },
+                didDrawCell: function(data) {
+                    if (data.section === 'body') {
+                        const txt = (data.cell.raw || "").toString().trim();
+                        if ((data.column.index === 2 && txt === 'VACIO') || (data.column.index === 9 && txt === 'INVALIDO') || txt === 'Revisar') {
+                             const { x, y, width, height } = data.cell;
+                             doc.setFillColor(48, 111, 219); doc.roundedRect(x+2, y+(height/2)-3, width-4, 6, 2, 2, 'F');
+                             doc.setTextColor(255, 255, 255); doc.setFontSize(6); doc.setFont("helvetica","bold");
+                             doc.text(txt, x+width/2, y+height/2+1, {align:'center'}); return false;
+                        }
+                    }
+                },
+                didDrawPage: function(data) {
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(0, 51, 102); doc.text("Reporte RN sin Regularizar", 14, 15);
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(80); doc.text("Grupos Relacionados por Diagnóstico", 14, 19);
+                    let nx = 14; nx = drawPill(doc, nx, 24, `Generado ${dateStr}`); nx = drawPill(doc, nx, 24, `${rnList.length} Registros`); 
+                    drawPill(doc, nx, 24, `Hoja ${data.pageNumber} / {total_pages_count_string}`);
+                    
+                    const pageSize = doc.internal.pageSize;
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(220, 38, 38);
+                    const disclaimer = "Documento de uso interno exclusivo de la Unidad de Análisis Clínico GRD. Contiene datos de pacientes protegidos por la Ley N° 19.628 sobre Protección de la Vida Privada y la Ley N° 20.584. Queda estrictamente prohibida su reproducción, distribución o divulgación no autorizada.";
+                    const splitDisclaimer = doc.splitTextToSize(disclaimer, pageSize.width - 28);
+                    doc.text(splitDisclaimer, pageSize.width / 2, pageSize.height - 15, { align: 'center' });
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(150);
+                    doc.text(`[ ${APP_NAME} ${APP_VERSION} ]`, pageSize.width / 2, pageSize.height - 6, { align: 'center' });
+                }
+            });
+            if (typeof doc.putTotalPages === 'function') doc.putTotalPages("{total_pages_count_string}");
+            doc.save('Reporte_RN_Sin_Regularizar.pdf');
+        }
+
+        function generatePdfStay() {
+            if (!allParsedRecords || allParsedRecords.length === 0) return;
+            let reportData = allParsedRecords.map(row => {
+                const c = row.c;
+                const ingDate = parseDate(c[COL_MAP.FECING]); const altDate = parseDate(c[COL_MAP.FECALT]);
+                let days = 0;
+                if (ingDate && altDate) {
+                    const diffTime = Math.abs(altDate - ingDate); days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                }
+                let estado = "";
+                if (c[COL_MAP.TIPALT] === '2' || (c[COL_MAP.NOTA] && c[COL_MAP.NOTA].toUpperCase().includes('FALLECIDO'))) estado = "FALLECIDO";
+                return {
+                    ficha: c[COL_MAP.HISTORIA], ep: c[COL_MAP.EPISODIO], rut: c[COL_MAP.CIP] || "SIN RUT",
+                    nombre: row.fullName, fecnac: c[COL_MAP.FECNAC], edad: row.age.text, 
+                    estadiaRaw: days, estadiaFmt: days + " días", ingreso: c[COL_MAP.FECING],
+                    alta: c[COL_MAP.FECALT], estado: estado
+                };
+            });
+
+            reportData.sort((a, b) => b.estadiaRaw - a.estadiaRaw);
+            const top40 = reportData.slice(0, 40);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const dateStr = new Date().toLocaleString('es-CL');
+
+            doc.autoTable({
+                head: [['Ficha', 'Episodio', 'RUT', 'Nombre Completo', 'Edad', 'Estadía', 'F. Ingreso', 'F. Alta', 'Estado']],
+                body: top40.map(r => [ r.ficha, r.ep, r.rut, r.nombre, r.edad, r.estadiaFmt, r.ingreso, r.alta, r.estado ]),
+                startY: 35, margin: { top: 35, bottom: 25, left: 14, right: 14 }, theme: 'plain',
+                styles: { font: 'helvetica', fontSize: 7, cellPadding: 3, textColor: 40, lineColor: 200, lineWidth: 0.1, valign: 'middle' },
+                headStyles: { fillColor: [16, 185, 129], textColor: 255, fontStyle: 'bold', lineWidth: 0 }, 
+                columnStyles: { 3: { width: 75 }, 5: { fontStyle: 'bold', halign: 'right' } },
+                didDrawCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 8) {
+                        if (data.cell.raw === 'FALLECIDO') {
+                            const { x, y, width, height } = data.cell;
+                            doc.setFillColor(20, 20, 20); doc.roundedRect(x + 2, y + (height / 2) - 3, width - 4, 6, 2, 2, 'F');
+                            doc.setTextColor(255, 255, 255); doc.setFontSize(6); doc.setFont("helvetica", "bold");
+                            doc.text("FALLECIDO", x + width / 2, y + height / 2 + 1, { align: 'center' }); return false;
+                        }
+                    }
+                    if (data.section === 'body' && data.column.index === 5) {
+                         const daysVal = parseInt(data.cell.raw);
+                         if (daysVal > 30) { doc.setTextColor(220, 38, 38); }
+                    }
+                },
+                didDrawPage: function(data) {
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(6, 78, 59); doc.text("Reporte Estancias", 14, 15);
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(80); doc.text("Grupos Relacionados por Diagnóstico - Ranking de ocupación", 14, 19);
+                    let nx = 14; nx = drawPill(doc, nx, 24, `Generado ${dateStr}`);
+                    nx = drawPill(doc, nx, 24, `Muestra: Top 40 de ${allParsedRecords.length} registros`);
+                    drawPill(doc, nx, 24, `Hoja ${data.pageNumber} / {total_pages_count_string}`);
+                    
+                    const pageSize = doc.internal.pageSize;
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(220, 38, 38);
+                    const disclaimer = "Documento de uso interno exclusivo de la Unidad de Análisis Clínico GRD. Contiene datos de pacientes protegidos por la Ley N° 19.628 sobre Protección de la Vida Privada y la Ley N° 20.584. Queda estrictamente prohibida su reproducción, distribución o divulgación no autorizada.";
+                    const splitDisclaimer = doc.splitTextToSize(disclaimer, pageSize.width - 28);
+                    doc.text(splitDisclaimer, pageSize.width / 2, pageSize.height - 15, { align: 'center' });
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(150);
+                    doc.text(`[ ${APP_NAME} ${APP_VERSION} ]`, pageSize.width / 2, pageSize.height - 6, { align: 'center' });
+                }
+            });
+            if (typeof doc.putTotalPages === 'function') doc.putTotalPages("{total_pages_count_string}");
+            doc.save('Reporte_Estancias.pdf');
+        }
+
+        function downloadFile(content, name, type) {
+            if (!content) return;
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            els.anchor.href = url; els.anchor.download = name; els.anchor.click(); URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
